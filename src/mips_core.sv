@@ -10,6 +10,7 @@ module mips_core(
     clk,
     rst_b
 );
+aa
     output  [31:0] inst_addr;
     input   [31:0] inst;
     output  [31:0] mem_addr;
