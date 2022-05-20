@@ -29,7 +29,7 @@ module mips_core(
     input          rst_b;
 
 
-    // wire [5:0] write_register;
+    // wire [5:0] rd_num;
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
 
@@ -52,20 +52,20 @@ ALU_CONTROLL alu_controll(.clk(clk)
 
 
 ALU alu(.clk(clk)
-,.in1(read_data1)
+,.in1(rs_data)
 ,.in2(mux_2_out)
 ,.alu_ctl_res(alu_ctl_res)
 ,.zero(zero)
 ,.(mem_addr));
 
 
-MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(write_register));
+MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
 
 
 MULTIPLEXER mux2(.in0(mem_data_in),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
 
 
-MULTIPLEXER mux3(.in0(mem_addr),.in1(mem_data_out),.select(mem_to_reg),.out(mux_3_out));
+MULTIPLEXER mux3(.in0(mem_addr),.in1(mem_data_out),.select(mem_to_reg),.out(rd_data));
 
 
 MULTIPLEXER mux4(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
@@ -77,15 +77,19 @@ SIGN_EXTEND sign_extend(inst(inst[15:0]),.out(sign_extend_out));
 
 and(mux_4_select,branch,zero);
 
-REGISTERS registers(
-    .clk(clk)
-    ,.read_register1(inst[25:21])
-    ,.read_registers2(inst[20:16])
-    ,.write_register(write_register)
-    ,.write_data(mux_2_out)
-    ,read_data1(read_data1)
-    ,read_data2(mem_data_in)
-    );
+
+regfile regfile(
+    .rs_data(rs_data),
+    .rt_data(mem_data_in),
+    .rs_num(inst[25:21]),
+    .rt_num(inst[20:16]),
+    .rd_num(rd_num),
+    .rd_data(rd_data),
+    .rd_we(reg_write),
+    .clk(clk),
+    .rst_b(rst_b),
+    .halted(halted)
+);    
 
 
 
