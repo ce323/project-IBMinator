@@ -1,6 +1,9 @@
 module controll(clk,inst,func,reg_dst,
 jump,branch,mem_read,mem_write_en,
 mem_to_reg,alu_op,alu_src,reg_write);
+
+//اینجا ورودی ها و خروجی ها تعیین شده اند
+
 input clk;
 input inst;
 input func;
@@ -14,13 +17,20 @@ output alu_op;
 output alu_src;
 output reg_write;
 
+//اینجا پهنای دو ورودی که یک بیتی نیستند تعیین شده است
 wire [5:0] inst;
 wire [5:0] func;
 
 
+//این بخش از کد برای سادگی در نوشتن ادامۀ دستورات نوشته شده
+// دستورات اینجا به صورت دایرکتیو خلاصه سازی شده اند که به خوانایی کد کمک میکند
+//`define  
+
+
+//اینجا حالت بندی بر روی آپکد انجام شده که بر اساس اینکه آپکد چیست، به ماژول های دیگر دستور داده می شود
 case(inst)
 	begin
-		//R-Type instructions
+		//R-Type instructions دستورات آر تایپ
 		//This part of the code is written for handling R-Format instructions
 		6'b000000:
 			begin
@@ -31,7 +41,7 @@ case(inst)
 			end
 
 
-		//J-Type instructions
+		//J-Type instructions دستورات جی تایپ
 		//This part of the code is written for handling J-Format instructions
 		
 		//J-Type (1): j
@@ -45,8 +55,8 @@ case(inst)
 			begin
 
 			end
-			
-		//I-Type instructions
+
+		//I-Type instructions دستورات آی تایپ
 //***********************************//
 		//I-Type (1): ADDi
 		6'b001000:
