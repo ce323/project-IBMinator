@@ -28,11 +28,11 @@ module mips_core(
     input          clk;
     input          rst_b;
 
-   /* inst_addr --> pc
+/*    inst_addr --> pc
       adder1 = pc + 4;
       adder2 = (pc+4) + shifter output;
 
-    ---------------mips_core :-----------------
+ ---------------mips_core :-----------------
 inst         -->   Instruction      : input 32 
 inst_addr    -->   pc               : output 32 
 mem_addr     -->   alu_result       : output 32
@@ -46,11 +46,11 @@ rst_b        -->  reset             : input 1
 
 
 ----------------regFile :-------------------
-rs_data            -->      : output 32
-rt_data            -->      : output 32
-rs_num             -->    read register 1                   : input 5
-rt_num             -->    read register 2                  : input 5
-rd_num             -->    write register                  : input 5
+rs_data            -->                      : output 32
+rt_data            -->                      : output 32
+rs_num             -->    read register 1   : input 5
+rt_num             -->    read register 2   : input 5
+rd_num             -->    write register    : input 5
 rd_data            -->                      : input 32
 rd_we              -->    regwrite          : input 1
 clk                -->    clk               : input 1
@@ -59,11 +59,53 @@ halted             -->    halted            : input 1
 --------------------------------------      ------
 
 
-    */
+----------------alu :-------------------
+           -->                      : output 
+           -->                      : output 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+           -->                      : input 
+--------------------------------------------
+
+----------------controll :-------------------
+            -->                      : output
+            -->                      : output
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+            -->                      : input 
+--------------------------------------------
+
+
+        open value questions ? 
+
+        what are : jump_adr --- zero --- 
+
+        alu_op bits???
+
+        mem_read?? 
+
+*/
+
 
     // wire [5:0] rd_num;
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
+
+
+
+wire [31:0] adder1_out,adder2_out,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
+wire [5:0] rd_num;
+wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
 
 
 ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
@@ -74,8 +116,11 @@ ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 +
 
 SHIFT_LEFT_2 sl_1(.in(inst[25:0]),out(jump_adr)); // this is not needed in harward impelementation
 
+defparam sl_1.bits = 26;
 
 SHIFT_LEFT_2 sl_2(.in(sign_extend_out),out(shift_out)); // gives the output to adder2
+
+defparam sl_2.bits = 32;
 
 // ALU_CONTROLL alu_controll(.clk(clk) // this is going to be merged with controller
 // ,.inst(inst[5:0])
@@ -118,7 +163,6 @@ defparam mux5.inbits = 32;
 //sign extender :D
 SIGN_EXTEND sign_extend(inst(inst[15:0]),.out(sign_extend_out));
 
-defparam mux1.inbits = 4;
 
 //controll to branch ,jump or neither of them
 and(mux_4_select,branch,zero);
