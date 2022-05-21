@@ -95,6 +95,7 @@ regfile regfile(
 
 CONTROLL controll(.clk(clk)
 ,.inst(inst[31:26])
+,.func(inst[5:0])
 ,.reg_dst(reg_dst)
 ,.jump(jump)
 ,.branch(branch)
