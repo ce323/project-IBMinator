@@ -1,0 +1,58 @@
+#! /c/Source/iverilog-install/bin/vvp
+:ivl_version "12.0 (devel)" "(s20150603-1110-g18392a46)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "C:\iverilog\lib\ivl\system.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_sys.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
+S_000001e1f77c6a80 .scope module, "MULTIPLEXER" "MULTIPLEXER" 2 1;
+ .timescale 0 0;
+    .port_info 0 /INPUT 4 "in0";
+    .port_info 1 /INPUT 4 "in1";
+    .port_info 2 /INPUT 1 "select";
+    .port_info 3 /OUTPUT 4 "out";
+P_000001e1f777c090 .param/l "inbits" 0 2 4, +C4<00000000000000000000000000000100>;
+o000001e1f77c6fd8 .functor BUFZ 4, C4<zzzz>; HiZ drive
+v000001e1f77935d0_0 .net "in0", 3 0, o000001e1f77c6fd8;  0 drivers
+o000001e1f77c7008 .functor BUFZ 4, C4<zzzz>; HiZ drive
+v000001e1f77c6350_0 .net "in1", 3 0, o000001e1f77c7008;  0 drivers
+v000001e1f777a2f0_0 .net "out", 3 0, L_000001e1f77930e0;  1 drivers
+o000001e1f77c7068 .functor BUFZ 1, C4<z>; HiZ drive
+v000001e1f77c6da0_0 .net "select", 0 0, o000001e1f77c7068;  0 drivers
+L_000001e1f77930e0 .functor MUXZ 4, o000001e1f77c6fd8, o000001e1f77c7008, o000001e1f77c7068, C4<>;
+S_000001e1f77c6c10 .scope module, "test" "test" 3 3;
+ .timescale 0 0;
+v000001e1f7792e60_0 .var "a", 31 0;
+v000001e1f7792f00_0 .var "b", 31 0;
+v000001e1f7792fa0_0 .net "out", 31 0, L_000001e1f7793180;  1 drivers
+v000001e1f7793040_0 .var "select", 0 0;
+S_000001e1f777ba30 .scope module, "adder1" "ADDER_32B" 3 9, 4 1 0, S_000001e1f77c6c10;
+ .timescale 0 0;
+    .port_info 0 /INPUT 32 "in1";
+    .port_info 1 /INPUT 32 "in2";
+    .port_info 2 /OUTPUT 32 "out";
+v000001e1f77c6e40_0 .net "in1", 31 0, v000001e1f7792e60_0;  1 drivers
+v000001e1f7792d20_0 .net "in2", 31 0, v000001e1f7792f00_0;  1 drivers
+v000001e1f7792dc0_0 .net "out", 31 0, L_000001e1f7793180;  alias, 1 drivers
+L_000001e1f7793180 .arith/sum 32, v000001e1f7792f00_0, v000001e1f7792e60_0;
+    .scope S_000001e1f77c6c10;
+T_0 ;
+    %pushi/vec4 112, 0, 32;
+    %store/vec4 v000001e1f7792e60_0, 0, 32;
+    %pushi/vec4 5, 0, 32;
+    %store/vec4 v000001e1f7792f00_0, 0, 32;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v000001e1f7793040_0, 0, 1;
+    %delay 10, 0;
+    %vpi_call 3 19 "$display", v000001e1f7792fa0_0 {0 0 0};
+    %end;
+    .thread T_0;
+# The file index is used to find the file name in the following table.
+:file_names 5;
+    "N/A";
+    "<interactive>";
+    "./multiplexer.v";
+    "testbench.v";
+    "./adder_32b.v";
