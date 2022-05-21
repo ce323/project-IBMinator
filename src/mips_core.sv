@@ -28,35 +28,45 @@ module mips_core(
     input          clk;
     input          rst_b;
 
+   /* inst_addr --> pc
+      adder1 = pc + 4;
+      adder2 = (pc+4) + shifter output;
+
+
+
+
+
+
+    */
 
     // wire [5:0] rd_num;
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
 
 
-ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out));
+ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
 
 
-ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out));
+ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
 
 
-SHIFT_LEFT_2 sl_1(.in(inst[25:0]),out(jump_adr));
+// SHIFT_LEFT_2 sl_1(.in(inst[25:0]),out(jump_adr)); // this is not needed in harward impelementation
 
 
-SHIFT_LEFT_2 sl_2(.in(sign_extend_out),out(shift_out));
+SHIFT_LEFT_2 sl_2(.in(sign_extend_out),out(shift_out)); // gives the output to adder2
 
-ALU_CONTROLL alu_controll(.clk(clk)
-,.inst(inst[5:0])
-,.alu_op(alu_op)
-,.alu_ctl_res(alu_ctl_res));
+// ALU_CONTROLL alu_controll(.clk(clk) // this is going to be merged with controller
+// ,.inst(inst[5:0])
+// ,.alu_op(alu_op)
+// ,.alu_ctl_res(alu_ctl_res));
 
 
 ALU alu(.clk(clk)
-,.in1(rs_data)
-,.in2(mux_2_out)
-,.alu_ctl_res(alu_ctl_res)
+,.in1(rs_data) //Read data 1
+,.in2(mux_2_out) // mux that alu_src controlls
+,.alu_op(alu_op) 
 ,.zero(zero)
-,.(mem_addr));
+,.alu_result(mem_addr));
 
 
 MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
