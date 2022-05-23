@@ -1,18 +1,18 @@
 module controll (
-	clk,
 	inst,
 	func,
+
 	reg_dst,
-	
 	jump,
 	branch,
 	mem_read,
-	mem_write_en,
-	
 	mem_to_reg,
 	alu_op,
+	mem_write_en,
 	alu_src,
-	reg_write
+	reg_write,
+
+	clk,
 );
 
 //اینجا ورودی ها و خروجی ها تعیین شده اند

@@ -29,27 +29,33 @@ output reg     halted;
 input          clk;
 input          rst_b;
 
-/*    inst_addr --> pc
-      adder1 = pc + 4;
-      adder2 = (pc+4) + shifter output;
+wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
- ---------------mips_core :-----------------
-inst         -->   Instruction             : input 32 
-inst_addr    -->   pc/Read address         : output 32 
-mem_addr     -->   alu_result/Address      : output 32
-mem_data_out -->   read_data               : input 4 * 8
-mem_data_in  -->   Read data 2/Write data  : output 4 * 8
-mem_write_en -->   MemWrite                : output 1
-halted       -->   syscall                 : output reg 1
-clk          -->   clock                   : input 1
-rst_b        -->   reset                   : input 1
--------------------------------------------
+/*
+----------------mips_core :------------------------
+inst            -->        Instruction             : input   32 
+inst_addr       -->        pc/Read address         : output  32 
+mem_addr        -->        alu_result/Address      : output  32
+mem_data_out    -->        read_data               : input   4 * 8
+mem_data_in     -->        Read data 2/Write data  : output  4 * 8
+mem_write_en    -->        MemWrite                : output  1
+halted          -->        syscall                 : output  reg 1
+clk             -->        clock                   : input   1
+rst_b           -->        reset                   : input   1
+---------------------------------------------------
 */
 
-// register file that is given
+wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write; // controll outputs
+
+wire [31:0] read_data_1;
+assign read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_data_in[3]};
+
+wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
+wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
+
 regfile regfile(
-    .rs_data(rs_data),
-    .rt_data(mem_data_in),
+    .rs_data(read_data_1),
+    .rt_data(read_data_2),
     .rs_num(inst[25:21]),
     .rt_num(inst[20:16]),
     .rd_num(rd_num),
@@ -61,156 +67,83 @@ regfile regfile(
 );    
 
 /*
-----------------regFile :-------------------
-rs_data            -->    Read data 1       : output 32
-rt_data            -->    Read data 2       : output 32
-rs_num             -->    Read register 1   : input 5
-rt_num             -->    Read register 2   : input 5
-rd_num             -->    Write register    : input 5
-rd_data            -->    Write data        : input 32
-rd_we              -->    RegWrite          : input 1
-clk                -->    clk               : input 1
-rst_b              -->    reset             : input 1
-halted             -->    halted            : input 1
---------------------------------------      ------
-
-
-----------------alu :-------------------
-           -->                      : output 
-           -->                      : output 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
-           -->                      : input 
---------------------------------------------
-
-----------------controll :-------------------
-            -->                      : output
-            -->                      : output
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
-            -->                      : input 
---------------------------------------------
-
-
-        open value questions ? 
-
-        mem_read?? 
-
+----------------regFile   :------------------------
+rs_data         -->        Read data 1             : output  32
+rt_data         -->        Read data 2             : output  32
+rs_num          -->        Read register 1         : input   5
+rt_num          -->        Read register 2         : input   5
+rd_num          -->        Write register          : input   5
+rd_data         -->        Write data              : input   32
+rd_we           -->        RegWrite                : input   1
+clk             -->        clk                     : input   1
+rst_b           -->        reset                   : input   1
+halted          -->        halted                  : input   1
+---------------------------------------------------
 */
 
 
-    // wire [5:0] rd_num;
-    // reg [31:0] inst;
-    // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
+wire zero;
+wire [31:0] sign_extend_out = $signed(inst);
+assign input_2_alu = alu_src ? sign_extend_out : read_data_2;
 
-reg[31:0] inst_addr_reg;
+ALU alu(
+    .in1(read_data_1),
+    .in2(input_2_alu),
+    .zero(zero),
+    .alu_result(mem_addr),
+    .clk(clk)
+    // .alu_op(alu_op), // get the wanted operation from controll
+// ,.sh.amount(inst[11:7])
+);
 
-wire [31:0] adder1_out,read_data2,adder2_out,read_data,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
-
-wire [5:0] rd_num,alu_op;
-
-wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
-
-// ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
-
-assign adder1_out = inst_addr + 4;
-
-// ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
-
-assign adder2_out = adder1_out + shift_out;
-
-assign jump_adr = {inst[25:0],1'b0,1'b0,adder1_out[31:28]};
-
-assign read_data = {mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]};
-
-assign read_data2 = {mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]};
-
-// SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
-
-assign shift_out = sign_extend_out<<2;
-
-// defparam sl_2.bits = 32;
-
-// ALU_CONTROLL alu_controll(.clk(clk) // this is going to be merged with controller
-// ,.inst(inst[5:0])
-// ,.alu_op(alu_op)
-// ,.alu_ctl_res(alu_ctl_res));
+/*
+----------------alu       :------------------------
+in1             -->        Read data               : input  32
+in2             -->        mux(0: Read data 2, 1: Sign extended out)  : input  32
+zero            -->        Zero                    : output  1
+alu_result      -->        ALU result (in ALU)     : output  32
+clk             -->        clk                     : input   1
+---------------------------------------------------
+*/
 
 
-ALU alu(.clk(clk)
-,.in1(rs_data) //Read data 1
-,.in2(mux_2_out) // mux that alu_src controlls
-,.alu_op(alu_op) // get the wanted operation from controll
-,.zero(zero) // outputs zero 
-,.sh.amount(inst[11:7])
-,.alu_result(mem_addr)); // the alu result which goes into data memory
+wire [5:0] alu_op; //TODO: maybe delete this
 
-//multiplexer that gives write register
-// MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
+controll controll(
+    .inst(inst[31:26]),
+    .func(inst[5:0]), //??????????????????????????????
+    .reg_dst(reg_dst),
+    .jump(jump),
+    .branch(branch),
+    .mem_to_reg(mem_to_reg),
+    .alu_op(alu_op),
+    .mem_write_en(mem_write_en),
+    .alu_src(alu_src),
+    .reg_write(reg_write),
+    .clk(clk)
+);
 
-assign rd_num = reg_dst ? inst[15:11] : inst[20:16];
 
-// defparam mux1.inbits = 4;
+// reg[31:0] inst_addr_reg;
 
-//multiplexer that giver the alu its input
-// MULTIPLEXER mux2(.in0(read_data2),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
+wire [31:0] PC_plus_4 = inst_addr + 4;
+wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
+wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
+// assign jump_adr = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
-assign mux_2_out = alu_src ? sign_extend_out : read_data2;
 
-// defparam mux2.inbits = 32;
 
-//multiplexer after Data memeory
-// MULTIPLEXER mux3(.in0(mem_addr),.in1(read_data),.select(mem_to_reg),.out(rd_data));
 
-assign rd_data = mem_to_reg ? read_data : mem_addr;
 
-// defparam mux3.inbits = 32;
-
-//multiplexer with adders input
-// MULTIPLEXER mux4(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
-
-assign mux_4_out = mux_4_select ? adder2_out : adder1_out;
-
-// defparam mux4.inbits = 32;
-
-//multiplexer with jump address input 
-// MULTIPLEXER mux5(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
+wire [31:0] mux_4_out, jump_adr;
 
 assign inst_addr = jump ? jump_adr : mux_4_out;
 
-// defparam mux5.inbits = 32;
-
-//sign extender :D
-// SIGN_EXTEND sign_extend(.in(inst[15:0]),.out(sign_extend_out));
-
-assign sign_extend_out = inst[15:0]; 
-
 
 //controll to branch ,jump or neither of them
+wire mux_4_select;
+assign mux_4_out = mux_4_select ? adder2_out : PC_plus_4;
 and(mux_4_select,branch,zero);
-
-controll controll(.clk(clk)
-,.inst(inst[31:26]) //input opcode
-,.func(inst[5:0]) //input function
-,.reg_dst(reg_dst)
-,.jump(jump)
-,.branch(branch)
-,.mem_write_en(mem_write_en)
-,.mem_to_reg(mem_to_reg)
-,.alu_op(alu_op)
-,.alu_src(alu_src)
-,.reg_write(reg_write)
-);
 
 
 always_ff @(posedge clk, negedge rst_b) begin
