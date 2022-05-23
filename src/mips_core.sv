@@ -98,7 +98,7 @@ halted             -->    halted            : input 1
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
 
-
+reg[31:0] inst_addr_reg;
 
 wire [31:0] adder1_out,read_data2,adder2_out,read_data,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
 
@@ -205,7 +205,6 @@ controll controll(.clk(clk)
 ,.reg_dst(reg_dst)
 ,.jump(jump)
 ,.branch(branch)
-,.mem_read(mem_read)
 ,.mem_write_en(mem_write_en)
 ,.mem_to_reg(mem_to_reg)
 ,.alu_op(alu_op)
