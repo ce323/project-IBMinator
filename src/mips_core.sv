@@ -1,10 +1,10 @@
-`include "adder_32b.v"
-`include "alu.v"
-`include "aluControll.v"
-`include "controll.v"
-`include "multiplexer.v"
-`include "registers.v"
-`include "sign_extend.v"
+// `include "adder_32b.v"
+// `include "alu.v"
+// `include "aluControll.v"
+// `include "controll.v"
+// `include "multiplexer.v"
+// `include "registers.v"
+// `include "sign_extend.v"
 
 
 module mips_core(
@@ -114,11 +114,11 @@ ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
 ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
 
 
-SHIFT_LEFT_2 sl_1(.in(inst[25:0]),out(jump_adr)); // this is not needed in harward impelementation
+SHIFT_LEFT_2 sl_1(.inst(inst[25:0]),.out(jump_adr)); // this is not needed in harward impelementation
 
 defparam sl_1.bits = 26;
 
-SHIFT_LEFT_2 sl_2(.in(sign_extend_out),out(shift_out)); // gives the output to adder2
+SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
 
 defparam sl_2.bits = 32;
 
@@ -161,7 +161,7 @@ MULTIPLEXER mux5(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
 defparam mux5.inbits = 32;
 
 //sign extender :D
-SIGN_EXTEND sign_extend(inst(inst[15:0]),.out(sign_extend_out));
+SIGN_EXTEND sign_extend(.in(inst[15:0]),.out(sign_extend_out));
 
 
 //controll to branch ,jump or neither of them
@@ -183,7 +183,7 @@ regfile regfile(
 
 
 
-CONTROLL controll(.clk(clk)
+controll controll(.clk(clk)
 ,.inst(inst[31:26]) //input opcode
 ,.func(inst[5:0]) //input function
 ,.reg_dst(reg_dst)

@@ -1,0 +1,26 @@
+make: Entering directory `/Users/AMF/Desktop/project-IBMinator'
+mips-linux-gnu-as -march=r6000 test/default/addiu.s -o test/default/addiu.elf
+ 
+dd skip=64 bs=1 if=test/default/addiu.elf of=test/default/addiu.bin count=$(expr $(stat --printf="%s" test/default/addiu.elf) - 788)
+xxd -p -c1 test/default/addiu.bin test/default/addiu.mem
+mips-linux-gnu-as -march=r6000 test/default/addtest.s -o test/default/addtest.elf
+dd skip=64 bs=1 if=test/default/addtest.elf of=test/default/addtest.bin count=$(expr $(stat --printf="%s" test/default/addtest.elf) - 788)
+xxd -p -c1 test/default/addtest.bin test/default/addtest.mem
+mips-linux-gnu-as -march=r6000 test/default/arithtest.s -o test/default/arithtest.elf
+dd skip=64 bs=1 if=test/default/arithtest.elf of=test/default/arithtest.bin count=$(expr $(stat --printf="%s" test/default/arithtest.elf) - 788)
+xxd -p -c1 test/default/arithtest.bin test/default/arithtest.mem
+mips-linux-gnu-as -march=r6000 test/default/brtest0.s -o test/default/brtest0.elf
+dd skip=64 bs=1 if=test/default/brtest0.elf of=test/default/brtest0.bin count=$(expr $(stat --printf="%s" test/default/brtest0.elf) - 788)
+xxd -p -c1 test/default/brtest0.bin test/default/brtest0.mem
+mips-linux-gnu-as -march=r6000 test/default/brtest2.s -o test/default/brtest2.elf
+dd skip=64 bs=1 if=test/default/brtest2.elf of=test/default/brtest2.bin count=$(expr $(stat --printf="%s" test/default/brtest2.elf) - 788)
+xxd -p -c1 test/default/brtest2.bin test/default/brtest2.mem
+mips-linux-gnu-as -march=r6000 test/default/memtest0.s -o test/default/memtest0.elf
+dd skip=64 bs=1 if=test/default/memtest0.elf of=test/default/memtest0.bin count=$(expr $(stat --printf="%s" test/default/memtest0.elf) - 788)
+xxd -p -c1 test/default/memtest0.bin test/default/memtest0.mem
+mips-linux-gnu-as -march=r6000 test/default/shifttest.s -o test/default/shifttest.elf
+dd skip=64 bs=1 if=test/default/shifttest.elf of=test/default/shifttest.bin count=$(expr $(stat --printf="%s" test/default/shifttest.elf) - 788)
+xxd -p -c1 test/default/shifttest.bin test/default/shifttest.mem
+rm test/default/memtest0.elf test/default/addiu.elf test/default/brtest0.bin test/default/shifttest.bin test/default/addiu.bin test/default/arithtest.bin test/default/memtest0.bin test/default/brtest0.elf test/default/addtest.elf test/default/arithtest.elf test/default/brtest2.elf test/default/shifttest.elf test/default/addtest.bin test/default/brtest2.bin
+make: Leaving directory `/Users/AMF/Desktop/project-IBMinator'
+ 

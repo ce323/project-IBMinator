@@ -1,7 +1,7 @@
-`include "multiplexer.v"
-`include "adder_32b.v"
-`include "shift_left_2.v"
-`include "sign_extend.v"
+// `include "multiplexer.v"
+// `include "adder_32b.v"
+// `include "shift_left_2.v"
+// `include "sign_extend.v"
 module test;
 
 reg [15:0] a,b;

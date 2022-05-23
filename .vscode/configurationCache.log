@@ -1,0 +1,1 @@
+{"buildTargets":["assemble","clean","clean-mem","compile","obj_dir/Vmips_machine","sim","verify","verify-all"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
