@@ -1,4 +1,4 @@
-module controll(
+module controll (
 	clk,
 	inst,
 	func,
