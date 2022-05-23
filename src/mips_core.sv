@@ -8,8 +8,8 @@
 
 
 module mips_core(
-    inst_addr,
     inst,
+    inst_addr,
     mem_addr,
     mem_data_out,
     mem_data_in,
@@ -18,15 +18,16 @@ module mips_core(
     clk,
     rst_b
 );
-    output  [31:0] inst_addr;
-    input   [31:0] inst;
-    output  [31:0] mem_addr;
-    input   [7:0]  mem_data_out[0:3];
-    output  [7:0]  mem_data_in[0:3];
-    output         mem_write_en;
-    output reg     halted;
-    input          clk;
-    input          rst_b;
+
+output  [31:0] inst_addr;
+input   [31:0] inst;
+output  [31:0] mem_addr;
+input   [7:0]  mem_data_out[0:3];
+output  [7:0]  mem_data_in[0:3];
+output         mem_write_en;
+output reg     halted;
+input          clk;
+input          rst_b;
 
 /*    inst_addr --> pc
       adder1 = pc + 4;
@@ -97,7 +98,7 @@ halted             -->    halted            : input 1
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
 
-
+reg[31:0] inst_addr_reg;
 
 wire [31:0] adder1_out,read_data2,adder2_out,read_data,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
 
@@ -105,9 +106,13 @@ wire [5:0] rd_num,alu_op;
 
 wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
 
-ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
+// ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
 
-ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
+assign adder1_out = inst_addr + 4;
+
+// ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
+
+assign adder2_out = adder1_out + shift_out;
 
 assign jump_adr = {inst[25:0],1'b0,1'b0,adder1_out[31:28]};
 
@@ -115,9 +120,11 @@ assign read_data = {mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out
 
 assign read_data2 = {mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]};
 
-SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
+// SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
 
-defparam sl_2.bits = 32;
+assign shift_out = sign_extend_out<<2;
+
+// defparam sl_2.bits = 32;
 
 // ALU_CONTROLL alu_controll(.clk(clk) // this is going to be merged with controller
 // ,.inst(inst[5:0])
@@ -133,32 +140,44 @@ ALU alu(.clk(clk)
 ,.alu_result(mem_addr)); // the alu result which goes into data memory
 
 //multiplexer that gives write register
-MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
+// MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
 
-defparam mux1.inbits = 4;
+assign rd_num = reg_dst ? inst[15:11] : inst[20:16];
+
+// defparam mux1.inbits = 4;
 
 //multiplexer that giver the alu its input
-MULTIPLEXER mux2(.in0(read_data2),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
+// MULTIPLEXER mux2(.in0(read_data2),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
 
-defparam mux2.inbits = 32;
+assign mux_2_out = alu_src ? sign_extend_out : read_data2;
+
+// defparam mux2.inbits = 32;
 
 //multiplexer after Data memeory
-MULTIPLEXER mux3(.in0(mem_addr),.in1(read_data),.select(mem_to_reg),.out(rd_data));7
+// MULTIPLEXER mux3(.in0(mem_addr),.in1(read_data),.select(mem_to_reg),.out(rd_data));
 
-defparam mux3.inbits = 32;
+assign rd_data = mem_to_reg ? read_data : mem_addr;
+
+// defparam mux3.inbits = 32;
 
 //multiplexer with adders input
-MULTIPLEXER mux4(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
+// MULTIPLEXER mux4(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
 
-defparam mux4.inbits = 32;
+assign mux_4_out = mux_4_select ? adder2_out : adder1_out;
+
+// defparam mux4.inbits = 32;
 
 //multiplexer with jump address input 
-MULTIPLEXER mux5(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
+// MULTIPLEXER mux5(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
 
-defparam mux5.inbits = 32;
+assign inst_addr = jump ? jump_adr : mux_4_out;
+
+// defparam mux5.inbits = 32;
 
 //sign extender :D
-SIGN_EXTEND sign_extend(.in(inst[15:0]),.out(sign_extend_out));
+// SIGN_EXTEND sign_extend(.in(inst[15:0]),.out(sign_extend_out));
+
+assign sign_extend_out = inst[15:0]; 
 
 
 //controll to branch ,jump or neither of them
@@ -186,7 +205,6 @@ controll controll(.clk(clk)
 ,.reg_dst(reg_dst)
 ,.jump(jump)
 ,.branch(branch)
-,.mem_read(mem_read)
 ,.mem_write_en(mem_write_en)
 ,.mem_to_reg(mem_to_reg)
 ,.alu_op(alu_op)
