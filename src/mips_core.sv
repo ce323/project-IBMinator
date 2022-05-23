@@ -98,7 +98,7 @@ halted             -->    halted            : input 1
     // reg [31:0] inst;
     // wire reg_dst,jump,branch,mem_read,mem_to_reg,alu_op,mem_write,alu_src,reg_write;
 
-
+reg[31:0] inst_addr_reg;
 
 wire [31:0] adder1_out,read_data2,adder2_out,read_data,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
 
@@ -132,12 +132,13 @@ assign shift_out = sign_extend_out<<2;
 // ,.alu_ctl_res(alu_ctl_res));
 
 
-// ALU alu(.clk(clk)
-// ,.in1(rs_data) //Read data 1
-// ,.in2(mux_2_out) // mux that alu_src controlls
-// ,.alu_op(alu_op) // get the wanted operation from controll
-// ,.zero(zero) // outputs zero 
-// ,.alu_result(mem_addr)); // the alu result which goes into data memory
+ALU alu(.clk(clk)
+,.in1(rs_data) //Read data 1
+,.in2(mux_2_out) // mux that alu_src controlls
+,.alu_op(alu_op) // get the wanted operation from controll
+,.zero(zero) // outputs zero 
+,.sh.amount(inst[11:7])
+,.alu_result(mem_addr)); // the alu result which goes into data memory
 
 //multiplexer that gives write register
 // MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
@@ -205,7 +206,6 @@ controll controll(.clk(clk)
 ,.reg_dst(reg_dst)
 ,.jump(jump)
 ,.branch(branch)
-,.mem_read(mem_read)
 ,.mem_write_en(mem_write_en)
 ,.mem_to_reg(mem_to_reg)
 ,.alu_op(alu_op)
