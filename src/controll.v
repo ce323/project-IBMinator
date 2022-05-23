@@ -1,21 +1,24 @@
-module controll(clk,inst,func,reg_dst,
-jump,branch,mem_read,mem_write_en,
-mem_to_reg,alu_op,alu_src,reg_write);
+module controll(
+	clk,
+	inst,
+	func,
+	reg_dst,
+	
+	jump,
+	branch,
+	mem_read,
+	mem_write_en,
+	
+	mem_to_reg,
+	alu_op,
+	alu_src,
+	reg_write
+);
 
 //اینجا ورودی ها و خروجی ها تعیین شده اند
 
-input clk;
-input inst;
-input func;
-output reg_dst;
-output jump;
-output branch;
-output mem_read;
-output mem_write_en;
-output mem_to_reg;
-output alu_op;
-output alu_src;
-output reg_write;
+input clk, inst, func;
+output reg_dst, jump, branch, mem_read, mem_write_en, mem_to_reg, alu_op, alu_src, reg_write;
 
 //اینجا پهنای دو ورودی که یک بیتی نیستند تعیین شده است
 wire [5:0] inst;

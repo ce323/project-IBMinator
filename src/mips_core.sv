@@ -18,15 +18,16 @@ module mips_core(
     clk,
     rst_b
 );
-    output  [31:0] inst_addr;
-    input   [31:0] inst;
-    output  [31:0] mem_addr;
-    input   [7:0]  mem_data_out[0:3];
-    output  [7:0]  mem_data_in[0:3];
-    output         mem_write_en;
-    output reg     halted;
-    input          clk;
-    input          rst_b;
+
+output  [31:0] inst_addr;
+input   [31:0] inst;
+output  [31:0] mem_addr;
+input   [7:0]  mem_data_out[0:3];
+output  [7:0]  mem_data_in[0:3];
+output         mem_write_en;
+output reg     halted;
+input          clk;
+input          rst_b;
 
 /*    inst_addr --> pc
       adder1 = pc + 4;
@@ -103,22 +104,22 @@ halted             -->    halted            : input 1
 
 
 
-wire [31:0] adder1_out,adder2_out,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
+wire [31:0] adder1_out, adder2_out, shift_out, sign_extend_out, mux_2_out, mux_4_out, jump_adr, rs_data, rd_data;
 wire [5:0] rd_num;
-wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
+wire jump, reg_dst, branch, alu_src, reg_write, mem_to_reg, mux_4_select, zero, mem_read;
 
 
-ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
+ADDER_32B adder1(.in1(inst_addr), .in2(4), .out(adder1_out)); // pc + 4
 
 
-ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
+ADDER_32B adder2(.in1(adder1_out), .in2(shift_out), .out(adder2_out)); // pc + 4 + shift_out
 
 
-SHIFT_LEFT_2 sl_1(.inst(inst[25:0]),.out(jump_adr)); // this is not needed in harward impelementation
+SHIFT_LEFT_2 sl_1(.inst(inst[25:0]), .out(jump_adr)); // this is not needed in harward impelementation
 
 defparam sl_1.bits = 26;
 
-SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
+SHIFT_LEFT_2 sl_2(.inst(sign_extend_out), .out(shift_out)); // gives the output to adder2
 
 defparam sl_2.bits = 32;
 
@@ -135,71 +136,71 @@ ALU alu(.clk(clk)
 ,.zero(zero) // outputs zero 
 ,.alu_result(mem_addr)); // the alu result which goes into data memory
 
-//multiplexer that gives write register
-MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
+// multiplexer that gives write register
+MULTIPLEXER mux_write_register(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_num));
 
-defparam mux1.inbits = 4;
+defparam mux_write_register.inbits = 4;
 
-//multiplexer that giver the alu its input
-MULTIPLEXER mux2(.in0(mem_data_in),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
+// multiplexer that giver the alu its input
+MULTIPLEXER mux_alu(.in0(mem_data_in),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
 
-defparam mux2.inbits = 32;
+defparam mux_alu.inbits = 32;
 
-//multiplexer after Data memeory
-MULTIPLEXER mux3(.in0(mem_addr),.in1(mem_data_out),.select(mem_to_reg),.out(rd_data));
+// multiplexer after Data memeory
+MULTIPLEXER mux_data_memory(.in0(mem_addr),.in1(mem_data_out),.select(mem_to_reg),.out(rd_data));
 
-defparam mux3.inbits = 32;
+defparam mux_data_memory.inbits = 32;
 
-//multiplexer with adders input
-MULTIPLEXER mux4(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
+//multiplexer with address input
+MULTIPLEXER mux_address_input(.in0(adder1_out),.in1(adder2_out),.select(mux_4_select),.out(mux_4_out));
 
-defparam mux4.inbits = 32;
+defparam mux_address_input.inbits = 32;
 
-//multiplexer with jump address input 
-MULTIPLEXER mux5(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
+// multiplexer with jump address input 
+MULTIPLEXER mux_jump(.in0(mux_4_out),.in1(jump_adr),.select(jump),.out(inst_addr));
 
-defparam mux5.inbits = 32;
+defparam mux_jump.inbits = 32;
 
-//sign extender :D
+// sign extender :D
 SIGN_EXTEND sign_extend(.in(inst[15:0]),.out(sign_extend_out));
 
 
-//controll to branch ,jump or neither of them
-and(mux_4_select,branch,zero);
+// controll to branch ,jump or neither of them
+and(mux_4_select, branch,zero);
 
-//register file that is given
+// register file that is given
 regfile regfile(
     .rs_data(rs_data), // read data 1
     .rt_data(mem_data_in), // read data 2
     .rs_num(inst[25:21]), //read register 1
     .rt_num(inst[20:16]), // read register 2
     .rd_num(rd_num), // write register
-    .rd_data(rd_data), //write data
-    .rd_we(reg_write), //controll signal to read or write
+    .rd_data(rd_data), // write data
+    .rd_we(reg_write), // controll signal to read or write
     .clk(clk), // got from input
     .rst_b(rst_b), //got from input
     .halted(halted) //got from input
 );    
 
 
-
-controll controll(.clk(clk)
-,.inst(inst[31:26]) //input opcode
-,.func(inst[5:0]) //input function
-,.reg_dst(reg_dst)
-,.jump(jump)
-,.branch(branch)
-,.mem_read(mem_read)
-,.mem_write_en(mem_write_en)
-,.mem_to_reg(mem_to_reg)
-,.alu_op(alu_op)
-,.alu_src(alu_src)
-,.reg_write(reg_write)
+controll controll(
+    .clk(clk)
+    ,.inst(inst[31:26]) // input opcode
+    ,.func(inst[5:0]) // input function
+    ,.reg_dst(reg_dst)
+    ,.jump(jump)
+    ,.branch(branch)
+    ,.mem_read(mem_read)
+    ,.mem_write_en(mem_write_en)
+    ,.mem_to_reg(mem_to_reg)
+    ,.alu_op(alu_op)
+    ,.alu_src(alu_src)
+    ,.reg_write(reg_write)
 );
 
 
-always_ff @(posedge clk,negedge rst_b) begin
-    if(rst_b == 0) begin
+always_ff @(posedge clk, negedge rst_b) begin
+    if (rst_b == 0) begin
         inst_addr <= 1;
         halted <= 0;
     end
@@ -207,7 +208,5 @@ always_ff @(posedge clk,negedge rst_b) begin
         inst_addr += 4;
     end
 end
-
-
 
 endmodule
