@@ -34,15 +34,15 @@ input          rst_b;
       adder2 = (pc+4) + shifter output;
 
  ---------------mips_core :-----------------
-inst         -->   Instruction      : input 32 
-inst_addr    -->   pc               : output 32 
-mem_addr     -->   alu_result       : output 32
-mem_data_out -->   read_data        : input 4 * 8
-mem_data_in  -->   read_data2       : output 4 * 8
-mem_write_en -->  Memwrite/read     : output 1        // created by controll
-halted       -->  syscall           : output reg 1
-clk          -->  clock             : input 1
-rst_b        -->  reset             : input 1
+inst         -->   Instruction             : input 32 
+inst_addr    -->   pc/Read address         : output 32 
+mem_addr     -->   alu_result/Address      : output 32
+mem_data_out -->   read_data               : input 4 * 8
+mem_data_in  -->   Read data 2/Write data  : output 4 * 8
+mem_write_en -->   MemWrite                : output 1        // created by controll
+halted       -->   syscall                 : output reg 1
+clk          -->   clock                   : input 1
+rst_b        -->   reset                   : input 1
 -------------------------------------------
 
 
@@ -137,6 +137,7 @@ ALU alu(.clk(clk)
 ,.in2(mux_2_out) // mux that alu_src controlls
 ,.alu_op(alu_op) // get the wanted operation from controll
 ,.zero(zero) // outputs zero 
+,.sh.amount(inst[11:7])
 ,.alu_result(mem_addr)); // the alu result which goes into data memory
 
 //multiplexer that gives write register
@@ -183,7 +184,7 @@ assign sign_extend_out = inst[15:0];
 //controll to branch ,jump or neither of them
 and(mux_4_select,branch,zero);
 
-//register file that is given
+// register file that is given
 regfile regfile(
     .rs_data(rs_data), // read data 1
     .rt_data(mem_data_in), // read data 2
@@ -191,7 +192,7 @@ regfile regfile(
     .rt_num(inst[20:16]), // read register 2
     .rd_num(rd_num), // write register
     .rd_data(rd_data), //write data
-    .rd_we(reg_write), //controll signal to read or write
+    .rd_we(reg_write), // RegWrite
     .clk(clk), // got from input
     .rst_b(rst_b), //got from input
     .halted(halted) //got from input
@@ -213,7 +214,7 @@ controll controll(.clk(clk)
 );
 
 
-always_ff @(posedge clk,negedge rst_b) begin
+always_ff @(posedge clk, negedge rst_b) begin
     if(rst_b == 0) begin
         inst_addr <= 1;
         halted <= 0;
