@@ -88,10 +88,6 @@ halted             -->    halted            : input 1
 
         open value questions ? 
 
-        what are : jump_adr --- zero --- 
-
-        alu_op bits???
-
         mem_read?? 
 
 */
@@ -103,20 +99,21 @@ halted             -->    halted            : input 1
 
 
 
-wire [31:0] adder1_out,adder2_out,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
-wire [5:0] rd_num;
-wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
+wire [31:0] adder1_out,read_data2,adder2_out,read_data,shift_out,sign_extend_out,mux_2_out,mux_4_out,jump_adr,rs_data,rd_data;
 
+wire [5:0] rd_num,alu_op;
+
+wire jump,reg_dst,branch,alu_src,reg_write,mem_to_reg,mux_4_select,zero,mem_read;
 
 ADDER_32B adder1(.in1(inst_addr),.in2(4),.out(adder1_out)); // pc + 4
 
-
 ADDER_32B adder2(.in1(adder1_out),.in2(shift_out),.out(adder2_out)); // pc + 4 + shift_out
 
+assign jump_adr = {inst[25:0],1'b0,1'b0,adder1_out[31:28]};
 
-SHIFT_LEFT_2 sl_1(.inst(inst[25:0]),.out(jump_adr)); // this is not needed in harward impelementation
+assign read_data = {mem_data_out[0],mem_data_out[1],mem_data_out[2],mem_data_out[3]};
 
-defparam sl_1.bits = 26;
+assign read_data2 = {mem_data_in[0],mem_data_in[1],mem_data_in[2],mem_data_in[3]};
 
 SHIFT_LEFT_2 sl_2(.inst(sign_extend_out),.out(shift_out)); // gives the output to adder2
 
@@ -141,12 +138,12 @@ MULTIPLEXER mux1(.in0(inst[20:16]),.in1(inst[15:11]),.select(reg_dst),.out(rd_nu
 defparam mux1.inbits = 4;
 
 //multiplexer that giver the alu its input
-MULTIPLEXER mux2(.in0(mem_data_in),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
+MULTIPLEXER mux2(.in0(read_data2),.in1(sign_extend_out),.select(alu_src),.out(mux_2_out));
 
 defparam mux2.inbits = 32;
 
 //multiplexer after Data memeory
-MULTIPLEXER mux3(.in0(mem_addr),.in1(mem_data_out),.select(mem_to_reg),.out(rd_data));
+MULTIPLEXER mux3(.in0(mem_addr),.in1(read_data),.select(mem_to_reg),.out(rd_data));7
 
 defparam mux3.inbits = 32;
 
@@ -202,9 +199,6 @@ always_ff @(posedge clk,negedge rst_b) begin
     if(rst_b == 0) begin
         inst_addr <= 1;
         halted <= 0;
-    end
-    else begin
-        inst_addr += 4;
     end
 end
 
