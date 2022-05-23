@@ -74,14 +74,14 @@ always @(*) begin
 		//J-Type (1): j
 		6'b000010:
 			begin
-			//?????
+			///؟؟؟؟؟
 				assign reg_write = 0;
-				assign reg_dst = 1'bx;
-				asign alu_src = 1; // sign extend
-				assign mem_to_reg = 1'bx;
-				assign mem_write_en = 1;
+				assign reg_dst = 0;
+				asign alu_src = 0; // sign extend
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
 				//assign mem_read = 0;
-				assign jump = 0;
+				assign jump = 1;
 				assign branch = 0;
 
 				assign alu_op = `ADD_16;
@@ -93,12 +93,12 @@ always @(*) begin
 			begin
 			///?????
 				assign reg_write = 0;
-				assign reg_dst = 1'bx;
-				asign alu_src = 1; // sign extend
-				assign mem_to_reg = 1'bx;
-				assign mem_write_en = 1;
+				assign reg_dst = 0;
+				asign alu_src = 0; // sign extend
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
 				//assign mem_read = 0;
-				assign jump = 0;
+				assign jump = 1;
 				assign branch = 0;
 
 				assign alu_op = `ADD_16;
@@ -200,7 +200,8 @@ always @(*) begin
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 0;
+				assign branch = 1;//??
+
 
 				assign alu_op = `SUB_5;
 
@@ -216,7 +217,7 @@ always @(*) begin
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 0;
+				assign branch = 1;//??
 
 				assign alu_op = `SUB_5;
 
@@ -232,8 +233,7 @@ always @(*) begin
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 0;
-
+				assign branch = 1;//??
 				assign alu_op = `SUB_5;
 
 			end	
@@ -248,7 +248,7 @@ always @(*) begin
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 0;
+				assign branch = 1;//??
 
 				assign alu_op = `SUB_5;
 
@@ -264,7 +264,7 @@ always @(*) begin
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 0;
+				assign branch = 1;//??
 
 				assign alu_op = `SUB_5;
 
@@ -366,7 +366,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `;?????
+				assign alu_op = `;//?????
 
 
 			end	
