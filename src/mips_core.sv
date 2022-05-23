@@ -39,21 +39,36 @@ inst_addr    -->   pc/Read address         : output 32
 mem_addr     -->   alu_result/Address      : output 32
 mem_data_out -->   read_data               : input 4 * 8
 mem_data_in  -->   Read data 2/Write data  : output 4 * 8
-mem_write_en -->   MemWrite                : output 1        // created by controll
+mem_write_en -->   MemWrite                : output 1
 halted       -->   syscall                 : output reg 1
 clk          -->   clock                   : input 1
 rst_b        -->   reset                   : input 1
 -------------------------------------------
+*/
 
+// register file that is given
+regfile regfile(
+    .rs_data(rs_data),
+    .rt_data(mem_data_in),
+    .rs_num(inst[25:21]),
+    .rt_num(inst[20:16]),
+    .rd_num(rd_num),
+    .rd_data(rd_data),
+    .rd_we(reg_write),
+    .clk(clk),
+    .rst_b(rst_b),
+    .halted(halted)
+);    
 
+/*
 ----------------regFile :-------------------
-rs_data            -->                      : output 32
-rt_data            -->                      : output 32
-rs_num             -->    read register 1   : input 5
-rt_num             -->    read register 2   : input 5
-rd_num             -->    write register    : input 5
-rd_data            -->                      : input 32
-rd_we              -->    regwrite          : input 1
+rs_data            -->    Read data 1       : output 32
+rt_data            -->    Read data 2       : output 32
+rs_num             -->    Read register 1   : input 5
+rt_num             -->    Read register 2   : input 5
+rd_num             -->    Write register    : input 5
+rd_data            -->    Write data        : input 32
+rd_we              -->    RegWrite          : input 1
 clk                -->    clk               : input 1
 rst_b              -->    reset             : input 1
 halted             -->    halted            : input 1
@@ -183,22 +198,6 @@ assign sign_extend_out = inst[15:0];
 
 //controll to branch ,jump or neither of them
 and(mux_4_select,branch,zero);
-
-// register file that is given
-regfile regfile(
-    .rs_data(rs_data), // read data 1
-    .rt_data(mem_data_in), // read data 2
-    .rs_num(inst[25:21]), //read register 1
-    .rt_num(inst[20:16]), // read register 2
-    .rd_num(rd_num), // write register
-    .rd_data(rd_data), //write data
-    .rd_we(reg_write), // RegWrite
-    .clk(clk), // got from input
-    .rst_b(rst_b), //got from input
-    .halted(halted) //got from input
-);    
-
-
 
 controll controll(.clk(clk)
 ,.inst(inst[31:26]) //input opcode
