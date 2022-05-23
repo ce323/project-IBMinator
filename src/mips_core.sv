@@ -137,6 +137,7 @@ ALU alu(.clk(clk)
 ,.in2(mux_2_out) // mux that alu_src controlls
 ,.alu_op(alu_op) // get the wanted operation from controll
 ,.zero(zero) // outputs zero 
+,.sh.amount(inst[11:7])
 ,.alu_result(mem_addr)); // the alu result which goes into data memory
 
 //multiplexer that gives write register
