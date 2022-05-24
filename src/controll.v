@@ -15,20 +15,20 @@ module controll (
 	clk
 );
 
-//اینجا ورودی ها و خروجی ها تعیین شده اند
+//input and output
 
 input clk, inst, func;
 output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write;
 // output mem_read;
 
-//اینجا پهنای دو ورودی که یک بیتی نیستند تعیین شده است
+//input and putput width
 wire [5:0] inst;
 wire [5:0] func;
 output wire [5:0] alu_op;
 
 
-//این بخش از کد برای سادگی در نوشتن ادامۀ دستورات نوشته شده
-// دستورات اینجا به صورت دایرکتیو خلاصه سازی شده اند که به خوانایی کد کمک میکند
+//simplification
+// directives
 `define XOR_1 6'b100110
 `define SLL_2 6'b000000
 `define SLLV_3 6'b000100
@@ -45,13 +45,13 @@ output wire [5:0] alu_op;
 `define DIV_14 6'b011010
 `define AND_15 6'b100100
 `define ADD_16 6'b100000
-//TODO: با پارسا قرار شد 5 بخش برنچ بعلاوۀ مورد آخر که داشت براش فانکشن نوشته بشه
+//TODO:5 branches and last instruction
 
 
-//اینجا حالت بندی بر روی آپکد انجام شده که بر اساس اینکه آپکد چیست، به ماژول های دیگر دستور داده می شود
+//case conditions
 always @(*) begin
-	case(inst[5:0])
-		//R-Type instructions دستورات آر تایپ
+	case(inst) 
+		//R-Type instructions
 		//This part of the code is written for handling R-Format instructions
 		6'b000000:
 			begin
@@ -69,7 +69,7 @@ always @(*) begin
 			end
 
 
-		//J-Type instructions دستورات جی تایپ
+		//J-Type instructions
 		//This part of the code is written for handling J-Format instructions
 		
 		//J-Type (1): j
@@ -105,7 +105,7 @@ always @(*) begin
 				// assign alu_op = `ADD_16;
 			end
 
-		//I-Type instructions دستورات آی تایپ
+		//I-Type instructions
 //***********************************//
 		//I-Type (1): ADDi
 		6'b001000:
@@ -367,7 +367,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `;//?????
+				assign alu_op = 1;//?????
 
 
 			end	
@@ -375,10 +375,7 @@ always @(*) begin
 
 
 
-
-
-
 endcase
-end
 
+end
 endmodule;

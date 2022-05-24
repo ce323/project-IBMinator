@@ -120,14 +120,15 @@ controll controll(
     .mem_write_en(mem_write_en),
     .alu_src(alu_src),
     .reg_write(reg_write),
-    .clk(clk)
+    .clk(clk),
+    .halted(halted_wire)
 );
 
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
-// assign jump_adr = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
+// assign jump_address = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
 // mux1 is the mux after "Add" (ALU result)
@@ -136,17 +137,23 @@ and(and_out, zero, branch);
 wire [31:0] mux1_out;
 assign mux1_out = and_out ? adder2_out : PC_plus_4;
 
-wire [31:0] mux_4_out, jump_adr;
+wire [31:0] jump_address;
 
-assign pc_input = jump ? jump_adr : mux_4_out;
+assign pc_input = jump ? jump_address : mux1_out;
 
 //program counter
-PC pc(.clk(clk),.rst_b(rst_b),.pc_input(pc_input),.pc_output(inst_addr),.halted(halted));
+PC pc(.clk(clk),.rst_b(rst_b),.pc_input(pc_input),.pc_output(inst_addr));
 
 
 //controll to branch ,jump or neither of them
-wire mux_4_select;
-assign mux_4_out = mux_4_select ? adder2_out : PC_plus_4;
+
+always @(negedge rst_b,posedge clk,posedge halted_wire) begin
+    if(rst_b == 0) 
+        halted = 0;
+    if(halted_wire == 1)
+        halted = 1;
+    // else halted =1 ; 
+end
 
 /*
 
