@@ -137,11 +137,10 @@ wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
 
 
 wire [31:0] mux_4_out, jump_adr;
-reg [31:0] inst_addr_reg;
 
-// assign inst_addr = jump ? jump_adr : mux_4_out;
-assign inst_addr = inst_addr_reg;
-
+assign pc_intput = jump ? jump_adr : mux_4_out;
+// assign inst_addr = inst_addr_reg;
+PC pc(.clk(clk),.(rst_b),.pc_input(pc_intput),.pc_output(inst_addr));
 //controll to branch ,jump or neither of them
 wire mux_4_select;
 assign mux_4_out = mux_4_select ? adder2_out : PC_plus_4;
@@ -155,6 +154,10 @@ always_ff @(posedge clk, negedge rst_b) begin
     end
 end
 
+/*
 
+ pc --> register : inst_addr --- 
+
+ */
 
 endmodule
