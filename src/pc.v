@@ -7,7 +7,6 @@ module PC(
 
 always @(posedge clk, negedge rst_b) begin
     if(rst_b == 0)
-        // halted <= 0;
         pc_output <= 1;
     else begin
       pc_output <= pc_input;
