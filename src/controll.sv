@@ -50,7 +50,7 @@ output reg [5:0] alu_op;
 
 
 
-always @(posedge clk) begin
+always_latch @(posedge clk) begin
 	case(inst)
 		6'b000000:
 			begin

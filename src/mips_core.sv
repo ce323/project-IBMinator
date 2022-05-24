@@ -77,7 +77,7 @@ halted          -->        halted                  : input   1
 
 
 wire zero;
-wire [31:0] sign_extend_out = $signed(inst);
+wire [31:0] sign_extend_out = {{16{inst[15]}}, inst[15:0]};
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
@@ -138,7 +138,7 @@ PC pc(
     .pc_output(inst_addr)
 );
 
-always @(posedge clk or negedge rst_b or posedge halted_wire) begin
+always_latch @(rst_b or halted_wire) begin
     if(rst_b == 0) 
         halted = 0;
     if(halted_wire == 1)
