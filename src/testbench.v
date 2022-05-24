@@ -4,7 +4,7 @@
 // // `include "sign_extend.v"
 // // `include "control.v"
 
-module test;
+// module test;
 
 // reg [15:0] a, b;
 // // reg [31:0] a,b,out;
@@ -35,7 +35,8 @@ module test;
 // wire 
 
 
-// always #1 begin
+// always  begin
+//     #1
 //   clk = ~clk;
 // end
 
@@ -68,4 +69,4 @@ module test;
 // end
 
 
-endmodule
+// endmodule

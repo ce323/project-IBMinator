@@ -143,7 +143,7 @@ PC pc(
     .pc_output(inst_addr)
 );
 
-always @(posedge clk or negedge rst_b or posedge halted_wire) begin
+always_latch @(rst_b or halted_wire) begin
     if(rst_b == 0) 
         halted = 0;
     if(halted_wire == 1)
