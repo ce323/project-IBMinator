@@ -6,6 +6,4 @@ module ALU (
     input clk
 );
 
-and(alu_result, in1, in2);
-
 endmodule
