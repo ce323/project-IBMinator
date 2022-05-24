@@ -12,12 +12,14 @@ module controll (
 	mem_to_reg,
 	alu_op,
 	alu_src,
-	reg_write
+	reg_write, 
+	halted
 );
 
 
 input clk, inst;
-output reg reg_dst, jump, branch, mem_read, mem_write_en, mem_to_reg, alu_src, reg_write;
+output reg reg_dst, jump, branch, mem_read,
+ mem_write_en, mem_to_reg, alu_src, reg_write, halted;
 
 wire [5:0] inst;
 input  [5:0] func;
@@ -39,10 +41,16 @@ output reg [5:0] alu_op;
 `define DIV_14 6'b011010
 `define AND_15 6'b100100
 `define ADD_16 6'b100000
+`define I_Type_6_BEQ 6'b111000
+`define I_Type_7_BNE 6'b111001
+`define I_Type_8_BLEZ 6'b111010
+`define I_Type_9_BGTZ 6'b111011
+`define I_Type_10_BGEZ 6'b111100
+`define I_Type_16_LUI 6'b111101
 
 
 
-always @(*) begin
+always @(posedge clk) begin
 	case(inst)
 		6'b000000:
 			begin
@@ -54,6 +62,10 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				if (func == `Syscall_8) 
+					assign halted = 1;
+				else
+					assign halted = 0;	
 
 				assign alu_op = func;
 
@@ -71,6 +83,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -87,6 +100,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 			end
@@ -104,6 +118,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -122,6 +137,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADDU_12;
 
@@ -140,6 +156,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `AND_15;
 
@@ -156,6 +173,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `XOR_1;
 
@@ -172,6 +190,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `OR_10;
 
@@ -188,9 +207,10 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
+				assign halted = 0;
 
 
-				assign alu_op = `SUB_5;
+				assign alu_op = `I_Type_6_BEQ;
 
 			end	
 //***********************************//
@@ -205,8 +225,9 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
+				assign halted = 0;
 
-				assign alu_op = `SUB_5;
+				assign alu_op = `I_Type_7_BNE;
 
 			end	
 //***********************************//
@@ -221,7 +242,8 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
-				assign alu_op = `SUB_5;
+				assign alu_op = `I_Type_8_BLEZ;
+				assign halted = 0;
 
 			end	
 //***********************************//
@@ -236,8 +258,9 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
+				assign halted = 0;
 
-				assign alu_op = `SUB_5;
+				assign alu_op = `I_Type_9_BGTZ;
 
 			end	
 //***********************************//
@@ -252,8 +275,9 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
+				assign halted = 0;
 
-				assign alu_op = `SUB_5;
+				assign alu_op = `I_Type_10_BGEZ;
 
 
 
@@ -270,6 +294,7 @@ always @(*) begin
 				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -288,6 +313,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -304,6 +330,7 @@ always @(*) begin
 				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -320,6 +347,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -336,6 +364,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
 				assign alu_op = `SLT_7;
 
@@ -352,8 +381,9 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign halted = 0;
 
-				assign alu_op = 1;//?????
+				assign alu_op = `I_Type_16_LUI;
 
 
 			end	
