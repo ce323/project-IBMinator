@@ -8,15 +8,15 @@
 
 
 module mips_core(
-    inst,
-    inst_addr,
-    mem_addr,
-    mem_data_out,
-    mem_data_in,
-    mem_write_en,
-    halted,
-    clk,
-    rst_b
+    inst, //instruction memory drives this
+    inst_addr, // we should declare this here **
+    mem_addr, //alu results drives this
+    mem_data_out, // output of data memory
+    mem_data_in, //read data 2 drives this
+    mem_write_en, // controll declares this
+    halted, // we should declare this here **
+    clk, // input from mips machine
+    rst_b // we should declare this here **
 );
 
 output  [31:0] inst_addr;
@@ -62,6 +62,7 @@ regfile regfile(
     .rd_data(rd_data),
     .rd_we(reg_write),
     .clk(clk),
+    .
     .rst_b(rst_b),
     .halted(halted)
 );    
@@ -136,9 +137,10 @@ wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
 
 
 wire [31:0] mux_4_out, jump_adr;
+reg [31:0] inst_addr_reg;
 
-assign inst_addr = jump ? jump_adr : mux_4_out;
-
+// assign inst_addr = jump ? jump_adr : mux_4_out;
+assign inst_addr = inst_addr_reg;
 
 //controll to branch ,jump or neither of them
 wire mux_4_select;
@@ -148,7 +150,7 @@ and(mux_4_select,branch,zero);
 
 always_ff @(posedge clk, negedge rst_b) begin
     if(rst_b == 0) begin
-        inst_addr <= 1;
+        inst_addr_reg <= 1;
         halted <= 0;
     end
 end
