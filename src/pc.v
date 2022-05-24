@@ -1,5 +1,5 @@
-module PC(
-    input clk,rst_b,
+module PC (
+    input clk, rst_b,
     input [31:0] pc_input,
     output reg [31:0] pc_output
 );
