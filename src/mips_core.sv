@@ -142,7 +142,12 @@ wire [31:0] jump_address;
 assign pc_input = jump ? jump_address : mux1_out;
 
 //program counter
-PC pc(.clk(clk),.rst_b(rst_b),.pc_input(pc_input),.pc_output(inst_addr));
+PC pc(
+    .clk(clk),
+    .rst_b(rst_b),
+    .pc_input(pc_input),
+    .pc_output(inst_addr)
+);
 
 always @(negedge rst_b,posedge clk,posedge halted_wire) begin
     if(rst_b == 0) 
