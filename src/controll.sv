@@ -131,8 +131,7 @@ always_latch @(posedge clk) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
-				assign mem_to_reg = 0;
+				assign alu_src = 1; // sign exte
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
@@ -142,7 +141,7 @@ always_latch @(posedge clk) begin
 				assign alu_op = `ADDU_12;
 
 
-
+				assign mem_to_reg = 0;
 			end
 //***********************************//
 		//I-Type (3): ANDi

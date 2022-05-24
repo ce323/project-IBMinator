@@ -106,13 +106,15 @@ module alu(input1w , input2w  , out , funcw , zero, clk);
 			out = {input2[15:0] , 16'b000000};
 		end
 	endcase
-		if(out == 0)begin
-			zero = 1;
-		end
-	else begin
-	zero = 0;
+
+	if(out == 0)begin
+		zero = 1;
 	end
- 	end
+	else begin
+	     zero = 0;
+	end
+
+end
 
 
 endmodule
