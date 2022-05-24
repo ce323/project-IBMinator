@@ -6,8 +6,12 @@ module mux(
 
 always @(*) begin
     case (select)
-        0: out = in0;
-        1: out = in1;
+        0: begin
+            out = in0;
+        end
+        1: begin
+            out = in1;
+        end
     endcase
 end
 

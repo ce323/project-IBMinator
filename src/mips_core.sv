@@ -81,13 +81,18 @@ wire [31:0] sign_extend_out = {{16{inst[15]}}, inst[15:0]};
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
+initial begin
+    $monitor("mem_addr=%x", mem_addr);
+end
+
 alu alu(
     .input1w(read_data_1),
     .input2w(input_2_alu),
     .zero(zero),
     .out(mem_addr),
     .funcw(alu_op), // get the wanted operation from controll
-    .clk(clk)
+    .clk(clk),
+    .rst_b(rst_b)
 );
 
 /*

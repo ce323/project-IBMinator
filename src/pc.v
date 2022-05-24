@@ -4,13 +4,13 @@ module PC (
     output reg [31:0] pc_output
 );
 
-initial begin
-    pc_output = 1;
-end
+// initial begin
+//     pc_output = 1;
+// end
 
 always @(posedge clk, negedge rst_b) begin
     if(rst_b == 0)
-        pc_output <= 1;
+        pc_output <= 0;
     else begin
       pc_output <= pc_input;
     end

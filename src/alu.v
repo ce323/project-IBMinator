@@ -1,11 +1,11 @@
-module alu(input1w , input2w  , out , funcw , zero, clk);
+module alu(input1w , input2w  , out , funcw , zero, clk, rst_b);
 	output reg zero;
 	input[31:0] input1w , input2w ;
 	reg [4:0] sh_amountw;
 	input[5:0] funcw;
     	reg[5:0] func;// this wasnt declared
 	output reg[31:0] out; // if out is needed
-    input clk;
+    input clk, rst_b;
 	reg [4:0] sh_amount;
 	reg[31:0] input1 , input2;
 	reg[5:0] xorr , sll , sllv , srl , sub , srlv , slt , suscall , subu , orr , norr , addu , mult , div , andd , jr , sra , I_Type_6_BEQ ,I_Type_7_BNE ,I_Type_8_BLEZ ,I_Type_9_BGTZ ,I_Type_10_BGEZ,I_Type_16_LUI;
@@ -35,7 +35,8 @@ module alu(input1w , input2w  , out , funcw , zero, clk);
 		I_Type_16_LUI =6'b111101;
 	end
 
-	always@(posedge clk/*input1 or input2 or func*/) begin
+// posedge clk or negedge rst_b/*input1w or input2w or funcw*/
+	always @(input1w or input2w or funcw) begin
 
 
 		input1 = input1w;
@@ -48,6 +49,7 @@ module alu(input1w , input2w  , out , funcw , zero, clk);
 
 		hold1 = input1;
 		hold2 = input2;
+		$display("out= %x :))", out);
 		case (func)
 		xorr :
 			out = input1 ^ input2;
