@@ -2,6 +2,7 @@
 // `include "adder_32b.v"
 // `include "shift_left_2.v"
 // `include "sign_extend.v"
+`include "control.v"
 
 module test;
 
@@ -24,6 +25,37 @@ wire [31:0] jump_adr;
 // SIGN_EXTEND se(
 //     .in(a),.out(out)
 // );
+
+reg clk;
+reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, halted;
+// output mem_read;
+
+wire [31:0] inst;
+reg [5:0] alu_op;
+wire 
+
+
+always #1 begin
+  clk = ~clk;
+end
+
+controll controll(
+    .inst(inst[31:26]),
+    .func(inst[5:0]),
+    .reg_dst(reg_dst),
+    .jump(jump),
+    .branch(branch),
+    .mem_to_reg(mem_to_reg),
+    .alu_op(alu_op),
+    .mem_write_en(mem_write_en),
+    .alu_src(alu_src),
+    .reg_write(reg_write),
+    .clk(clk),
+    .halted(halted_wire)
+);
+
+
+
 assign jump_adr = a;
 initial begin
     a = 32'b 0;

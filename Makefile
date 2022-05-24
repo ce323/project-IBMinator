@@ -9,8 +9,8 @@ ASM = $(wildcard test/**/*.s)
 MEM = $(ASM:%.s=%.mem)
 
 # binutils-mips-linux-gnu is needed for assembleing.
-%.elf: %.s
-	mips-linux-gnu-as -march=r6000 $< -o $@
+# %.elf: %.s
+# 	mips-linux-gnu-as -march=r6000 $< -o $@
 
 %.bin: %.elf
 	dd skip=64 bs=1 if=$< of=$@ count=$$(expr $$(stat --printf="%s" $<) - 788)
@@ -33,8 +33,7 @@ compile: obj_dir/Vmips_machine
 
 sim: compile assemble
 	cp ${INPUT}.mem output/instructions.mem
-	docker run --entrypoint=/work/obj_dir/Vmips_machine -ti -v ${PWD}:/work \
-        verilator/verilator:latest
+	./obj_dir/Vmips_machine
 
 verify: sim
 	diff -u ${INPUT}.reg output/regdump.reg 1>&2

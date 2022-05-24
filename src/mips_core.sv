@@ -1,12 +1,3 @@
-// `include "adder_32b.v"
-// `include "alu.v"
-// `include "aluControll.v"
-// `include "controll.v"
-// `include "multiplexer.v"
-// `include "registers.v"
-// `include "sign_extend.v"
-
-
 module mips_core(
     inst, //instruction memory drives this
     inst_addr, // we should declare this here **
