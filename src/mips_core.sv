@@ -111,7 +111,7 @@ wire [5:0] alu_op; //TODO: maybe delete this
 
 controll controll(
     .inst(inst[31:26]),
-    .func(inst[5:0]), //??????????????????????????????
+    .func(inst[5:0]),
     .reg_dst(reg_dst),
     .jump(jump),
     .branch(branch),
@@ -127,7 +127,7 @@ controll controll(
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
-wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
+wire [31:0] jump_address = {PC_plus_4[31:28], 2'b0, inst[25:0]}
 // assign jump_address = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
@@ -144,9 +144,6 @@ assign pc_input = jump ? jump_address : mux1_out;
 //program counter
 PC pc(.clk(clk),.rst_b(rst_b),.pc_input(pc_input),.pc_output(inst_addr));
 
-
-//controll to branch ,jump or neither of them
-
 always @(negedge rst_b,posedge clk,posedge halted_wire) begin
     if(rst_b == 0) 
         halted = 0;
@@ -154,11 +151,5 @@ always @(negedge rst_b,posedge clk,posedge halted_wire) begin
         halted = 1;
     // else halted =1 ; 
 end
-
-/*
-
- pc --> register : inst_addr --- 
-
- */
 
 endmodule
