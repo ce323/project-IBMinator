@@ -1,18 +1,16 @@
-module alu(
-    input [31:0] input1w, input2w,
-    output reg[31:0] out,
-    input[5:0] funcw,
-    output reg zero,
-    input clk
-);
-	
+module alu(input1w , input2w  , out , funcw , zero, clk);
+	output reg zero;
+	input[31:0] input1w , input2w ;
+	reg [4:0] sh_amountw;
+	input[5:0] funcw;
+    	reg[5:0] func;// this wasnt declared
+	output reg[31:0] out; // if out is needed
+    input clk;
 	reg [4:0] sh_amount;
-    reg[5:0] func;
-	wire [4:0] sh_amountw;
 	reg[31:0] input1 , input2;
 	reg[5:0] xorr , sll , sllv , srl , sub , srlv , slt , suscall , subu , orr , norr , addu , mult , div , andd , jr , sra , I_Type_6_BEQ ,I_Type_7_BNE ,I_Type_8_BLEZ ,I_Type_9_BGTZ ,I_Type_10_BGEZ,I_Type_16_LUI;
 	reg signed [31:0] hold1 , hold2;
-
+    
 	initial begin
 		xorr = 6'b100110;
  		sll = 6'b000000;
@@ -37,7 +35,7 @@ module alu(
 		I_Type_16_LUI =6'b111101;
 	end
 
-	always@(posedge clk or input1 or input2 or func) begin
+	always@(posedge clk/*input1 or input2 or func*/) begin
 
 
 		input1 = input1w;
@@ -113,7 +111,7 @@ module alu(
 		end
 	else begin
 	zero = 0;
-    end
+	end
  	end
 
 
