@@ -5,25 +5,26 @@ module controll (
 	reg_dst,
 	jump,
 	branch,
-	mem_read,
+	// mem_read,
 	mem_to_reg,
 	alu_op,
 	mem_write_en,
 	alu_src,
 	reg_write,
 
-	clk,
+	clk
 );
 
 //اینجا ورودی ها و خروجی ها تعیین شده اند
 
 input clk, inst, func;
-output reg_dst, jump, branch, mem_read, mem_write_en, mem_to_reg, alu_op, alu_src, reg_write;
+output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write;
+// output mem_read;
 
 //اینجا پهنای دو ورودی که یک بیتی نیستند تعیین شده است
 wire [5:0] inst;
 wire [5:0] func;
-wire [5:0] alu_op;
+output wire [5:0] alu_op;
 
 
 //این بخش از کد برای سادگی در نوشتن ادامۀ دستورات نوشته شده
@@ -49,21 +50,21 @@ wire [5:0] alu_op;
 
 //اینجا حالت بندی بر روی آپکد انجام شده که بر اساس اینکه آپکد چیست، به ماژول های دیگر دستور داده می شود
 always @(*) begin
-	case(inst)
+	case(inst[5:0])
 		//R-Type instructions دستورات آر تایپ
 		//This part of the code is written for handling R-Format instructions
 		6'b000000:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = func;
+				// assign alu_op = func;
 
 			end
 
@@ -77,14 +78,14 @@ always @(*) begin
 			///؟؟؟؟؟
 				assign reg_write = 0;
 				assign reg_dst = 0;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 			end
 
@@ -94,14 +95,14 @@ always @(*) begin
 			///?????
 				assign reg_write = 0;
 				assign reg_dst = 0;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 			end
 
 		//I-Type instructions دستورات آی تایپ
@@ -111,14 +112,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 
 
@@ -129,14 +130,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADDU_12;
+				// assign alu_op = `ADDU_12;
 
 
 
@@ -147,14 +148,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `AND_15;
+				// assign alu_op = `AND_15;
 
 			end	
 //***********************************//
@@ -163,14 +164,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `XOR_1;
+				// assign alu_op = `XOR_1;
 
 			end	
 //***********************************//
@@ -179,14 +180,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `OR_10;
+				// assign alu_op = `OR_10;
 
 			end	
 //***********************************//
@@ -195,7 +196,7 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
@@ -203,7 +204,7 @@ always @(*) begin
 				assign branch = 1;//??
 
 
-				assign alu_op = `SUB_5;
+				// assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -212,14 +213,14 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
 
-				assign alu_op = `SUB_5;
+				// assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -228,13 +229,13 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
-				assign alu_op = `SUB_5;
+				// assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -243,14 +244,14 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
 
-				assign alu_op = `SUB_5;
+				// assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -259,14 +260,14 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				asign alu_src = 0; // sign extend
+				assign alu_src = 0; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
 
-				assign alu_op = `SUB_5;
+				// assign alu_op = `SUB_5;
 
 
 
@@ -277,14 +278,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 
 
@@ -295,14 +296,14 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1'bx;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 1'bx;
 				assign mem_write_en = 1;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -311,14 +312,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
 				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -327,14 +328,14 @@ always @(*) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1'bx;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 1'bx;
 				assign mem_write_en = 1;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `ADD_16;
+				// assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -343,14 +344,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `SLT_7;
+				// assign alu_op = `SLT_7;
 
 			end	
 //***********************************//
@@ -359,14 +360,14 @@ always @(*) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				asign alu_src = 1; // sign extend
+				assign alu_src = 1; // sign extend
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 
-				assign alu_op = `;//?????
+				// assign alu_op = `;//?????
 
 
 			end	

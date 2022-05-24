@@ -29,8 +29,6 @@ output reg     halted;
 input          clk;
 input          rst_b;
 
-wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-
 /*
 ----------------mips_core :------------------------
 inst            -->        Instruction             : input   32 
@@ -45,10 +43,12 @@ rst_b           -->        reset                   : input   1
 ---------------------------------------------------
 */
 
-wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write; // controll outputs
+// controll outputs
+wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 
 wire [31:0] read_data_1;
-assign read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_data_in[3]};
+wire [31:0] read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_data_in[3]};
+wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
 wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
@@ -85,7 +85,7 @@ halted          -->        halted                  : input   1
 
 wire zero;
 wire [31:0] sign_extend_out = $signed(inst);
-assign input_2_alu = alu_src ? sign_extend_out : read_data_2;
+wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 
 ALU alu(
     .in1(read_data_1),
@@ -125,15 +125,17 @@ controll controll(
 );
 
 
-// reg[31:0] inst_addr_reg;
-
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
 // assign jump_adr = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
-
+// mux1 is the mux after "Add" (ALU result)
+wire and_out;
+and(and_out, zero, branch);
+wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
+assign inst_addr = jump ? jump_address : mux1_out;
 
 
 wire [31:0] mux_4_out, jump_adr;
@@ -146,12 +148,11 @@ wire mux_4_select;
 assign mux_4_out = mux_4_select ? adder2_out : PC_plus_4;
 and(mux_4_select,branch,zero);
 
-
 always_ff @(posedge clk, negedge rst_b) begin
-    if(rst_b == 0) begin
-        inst_addr_reg <= 1;
+    if(rst_b == 0)
         halted <= 0;
-    end
+    else
+        halted <= 1;
 end
 
 /*
