@@ -42,7 +42,10 @@ wire [31:0] read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_d
 wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
+wire [31:0] rd_data ;
+// = mem_to_reg ? read_data : mem_addr;
+
+mux m(.select(mem_to_reg),.in0(mem_addr),.in1(read_data),.out(rd_data));
 
 regfile regfile(
     .rs_data(read_data_1),
