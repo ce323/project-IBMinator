@@ -8,15 +8,15 @@
 
 
 module mips_core(
-    inst,
-    inst_addr,
-    mem_addr,
-    mem_data_out,
-    mem_data_in,
-    mem_write_en,
-    halted,
-    clk,
-    rst_b
+    inst, //instruction memory drives this
+    inst_addr, // we should declare this here **
+    mem_addr, //alu results drives this
+    mem_data_out, // output of data memory
+    mem_data_in, //read data 2 drives this
+    mem_write_en, // controll declares this
+    halted, // we should declare this here **
+    clk, // input from mips machine
+    rst_b // we should declare this here **
 );
 
 output  [31:0] inst_addr;
@@ -62,6 +62,7 @@ regfile regfile(
     .rd_data(rd_data),
     .rd_we(reg_write),
     .clk(clk),
+    .
     .rst_b(rst_b),
     .halted(halted)
 );    
@@ -125,14 +126,19 @@ controll controll(
 
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
-wire [31:0] sign_extend_out_shift = sign_extend_out << 2;
-// adder2 is the adder after "Shift left two" (ALU result)
-wire [31:0] adder2_out = PC_plus_4 + sign_extend_out_shift;
-
-wire [27:0] inst_shift = {inst[25:0], 2'b0};
-wire [3:0] parts_of_PC_plus_4 = PC_plus_4[31:28];
-wire [31:0] jump_address = {parts_of_PC_plus_4, inst_shift};
+wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
+wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
 // assign jump_adr = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
+
+
+
+
+
+wire [31:0] mux_4_out, jump_adr;
+reg [31:0] inst_addr_reg;
+
+// assign inst_addr = jump ? jump_adr : mux_4_out;
+assign inst_addr = inst_addr_reg;
 
 // mux1 is the mux after "Add" (ALU result)
 wire and_out;
