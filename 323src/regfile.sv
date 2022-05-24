@@ -29,13 +29,18 @@ module regfile(
     assign rt_data = data[rt_num];
 
     always_ff @(posedge clk, negedge rst_b) begin
-        if (rst_b == 0) begin
+                if (rst_b == 0) begin
             int i;
             for (i = 0; i < size; i++)
                 data[i] <= 0;
         end else begin
             if (rd_we && (rd_num != 0))
                 data[rd_num] <= rd_data;
+        end
+
+
+        if (rd_num == 8) begin
+            $display("%x %x", rd_data, data[rd_num]);
         end
     end
 

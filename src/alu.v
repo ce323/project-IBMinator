@@ -7,8 +7,8 @@ module alu(
 );
 	
 	reg [4:0] sh_amount;
-    	// reg[5:0] func;// this wasnt declared
-	reg [4:0] sh_amount;
+    reg[5:0] func;
+	wire [4:0] sh_amountw;
 	reg[31:0] input1 , input2;
 	reg[5:0] xorr , sll , sllv , srl , sub , srlv , slt , suscall , subu , orr , norr , addu , mult , div , andd , jr , sra , I_Type_6_BEQ ,I_Type_7_BNE ,I_Type_8_BLEZ ,I_Type_9_BGTZ ,I_Type_10_BGEZ,I_Type_16_LUI;
 	reg signed [31:0] hold1 , hold2;
@@ -37,7 +37,7 @@ module alu(
 		I_Type_16_LUI =6'b111101;
 	end
 
-	always@(posedge clk/* or input1 or input2 or func*/) begin
+	always@(posedge clk or input1 or input2 or func) begin
 
 
 		input1 = input1w;
@@ -113,7 +113,7 @@ module alu(
 		end
 	else begin
 	zero = 0;
-	end
+    end
  	end
 
 

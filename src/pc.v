@@ -5,7 +5,7 @@ module PC (
 );
 
 initial begin
-    pc_output <= 1;
+    pc_output = 1;
 end
 
 always @(posedge clk, negedge rst_b) begin
