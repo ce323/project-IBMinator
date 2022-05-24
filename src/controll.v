@@ -6,7 +6,7 @@ module controll (
 	
 	jump,
 	branch,
-	mem_read,
+	// mem_read,
 	mem_write_en,
 	
 	mem_to_reg,
@@ -18,8 +18,8 @@ module controll (
 
 
 input clk, inst;
-output reg reg_dst, jump, branch, mem_read,
- mem_write_en, mem_to_reg, alu_src, reg_write, halted;
+output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, halted;
+// output mem_read;
 
 wire [5:0] inst;
 input  [5:0] func;
@@ -388,6 +388,9 @@ always @(posedge clk) begin
 
 			end	
 //***********************************//
+		default:
+			begin
+			end
 
 
 

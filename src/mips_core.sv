@@ -134,10 +134,7 @@ wire [31:0] jump_address = {PC_plus_4[31:28], 2'b0, inst[25:0]};
 wire and_out;
 and(and_out, zero, branch);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
-
-wire [31:0] jump_address;
-
-assign pc_input = jump ? jump_address : mux1_out;
+wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
 //program counter
 PC pc(
