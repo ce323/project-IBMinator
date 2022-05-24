@@ -134,26 +134,20 @@ wire [31:0] jump_address = {PC_plus_4[31:28], (inst[25:0] << 2)}
 // mux1 is the mux after "Add" (ALU result)
 wire and_out;
 and(and_out, zero, branch);
-wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
-assign inst_addr = jump ? jump_address : mux1_out;
-
+wire [31:0] mux1_out;
+assign mux1_out = and_out ? adder2_out : PC_plus_4;
 
 wire [31:0] mux_4_out, jump_adr;
 
-assign pc_intput = jump ? jump_adr : mux_4_out;
-// assign inst_addr = inst_addr_reg;
-PC pc(.clk(clk),.(rst_b),.pc_input(pc_intput),.pc_output(inst_addr));
+assign pc_input = jump ? jump_adr : mux_4_out;
+
+//program counter
+PC pc(.clk(clk),.rst_b(rst_b),.pc_input(pc_input),.pc_output(inst_addr),.halted(halted));
+
+
 //controll to branch ,jump or neither of them
 wire mux_4_select;
 assign mux_4_out = mux_4_select ? adder2_out : PC_plus_4;
-and(mux_4_select,branch,zero);
-
-always_ff @(posedge clk, negedge rst_b) begin
-    if(rst_b == 0)
-        halted <= 0;
-    else
-        halted <= 1;
-end
 
 /*
 
