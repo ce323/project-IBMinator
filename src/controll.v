@@ -1,34 +1,28 @@
 module controll (
+	clk,
 	inst,
 	func,
-
 	reg_dst,
+	
 	jump,
 	branch,
-	// mem_read,
+	mem_read,
+	mem_write_en,
+	
 	mem_to_reg,
 	alu_op,
-	mem_write_en,
 	alu_src,
-	reg_write,
-
-	clk
+	reg_write
 );
 
-//input and output
 
-input clk, inst, func;
-output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write;
-// output mem_read;
+input clk, inst;
+output reg reg_dst, jump, branch, mem_read, mem_write_en, mem_to_reg, alu_src, reg_write;
 
-//input and putput width
 wire [5:0] inst;
-wire [5:0] func;
-output wire [5:0] alu_op;
+input  [5:0] func;
+output reg [5:0] alu_op;
 
-
-//simplification
-// directives
 `define XOR_1 6'b100110
 `define SLL_2 6'b000000
 `define SLLV_3 6'b000100
@@ -45,14 +39,11 @@ output wire [5:0] alu_op;
 `define DIV_14 6'b011010
 `define AND_15 6'b100100
 `define ADD_16 6'b100000
-//TODO:5 branches and last instruction
 
 
-//case conditions
+
 always @(*) begin
-	case(inst) 
-		//R-Type instructions
-		//This part of the code is written for handling R-Format instructions
+	case(inst)
 		6'b000000:
 			begin
 				assign reg_write = 1;
@@ -64,18 +55,14 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = func;
+				assign alu_op = func;
 
 			end
 
 
-		//J-Type instructions
-		//This part of the code is written for handling J-Format instructions
 		
-		//J-Type (1): j
 		6'b000010:
 			begin
-			///؟؟؟؟؟
 				assign reg_write = 0;
 				assign reg_dst = 0;
 				assign alu_src = 0; // sign extend
@@ -85,14 +72,13 @@ always @(*) begin
 				assign jump = 1;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 			end
 
 		//J-Type (2): JAL
 		6'b000011:
 			begin
-			///?????
 				assign reg_write = 0;
 				assign reg_dst = 0;
 				assign alu_src = 0; // sign extend
@@ -102,7 +88,7 @@ always @(*) begin
 				assign jump = 1;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 			end
 
 		//I-Type instructions
@@ -119,7 +105,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 
 
@@ -137,7 +123,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADDU_12;
+				assign alu_op = `ADDU_12;
 
 
 
@@ -155,7 +141,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `AND_15;
+				assign alu_op = `AND_15;
 
 			end	
 //***********************************//
@@ -171,7 +157,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `XOR_1;
+				assign alu_op = `XOR_1;
 
 			end	
 //***********************************//
@@ -187,7 +173,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `OR_10;
+				assign alu_op = `OR_10;
 
 			end	
 //***********************************//
@@ -204,7 +190,7 @@ always @(*) begin
 				assign branch = 1;//??
 
 
-				// assign alu_op = `SUB_5;
+				assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -220,7 +206,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 1;//??
 
-				// assign alu_op = `SUB_5;
+				assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -235,7 +221,7 @@ always @(*) begin
 				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 1;//??
-				// assign alu_op = `SUB_5;
+				assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -251,7 +237,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 1;//??
 
-				// assign alu_op = `SUB_5;
+				assign alu_op = `SUB_5;
 
 			end	
 //***********************************//
@@ -267,7 +253,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 1;//??
 
-				// assign alu_op = `SUB_5;
+				assign alu_op = `SUB_5;
 
 
 
@@ -285,7 +271,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 
 
@@ -303,7 +289,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -319,7 +305,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -335,7 +321,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `ADD_16;
+				assign alu_op = `ADD_16;
 
 			end	
 //***********************************//
@@ -351,7 +337,7 @@ always @(*) begin
 				assign jump = 0;
 				assign branch = 0;
 
-				// assign alu_op = `SLT_7;
+				assign alu_op = `SLT_7;
 
 			end	
 //***********************************//
@@ -376,6 +362,5 @@ always @(*) begin
 
 
 endcase
-
 end
-endmodule;
+endmodule
