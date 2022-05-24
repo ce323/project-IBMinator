@@ -33,7 +33,6 @@ compile: obj_dir/Vmips_machine
 
 sim: compile assemble
 	cp ${INPUT}.mem output/instructions.mem
-	# ./obj_dir/Vmips_machine
 	docker run --entrypoint=/work/obj_dir/Vmips_machine -ti -v ${PWD}:/work \
         verilator/verilator:latest
 

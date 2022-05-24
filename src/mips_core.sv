@@ -87,12 +87,12 @@ wire [31:0] sign_extend_out = $signed(inst);
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
-ALU alu(
-    .in1(read_data_1),
-    .in2(input_2_alu),
+alu alu(
+    .input1w(read_data_1),
+    .input2w(input_2_alu),
     .zero(zero),
-    .alu_result(mem_addr),
-    .alu_op(alu_op), // get the wanted operation from controll
+    .out(mem_addr),
+    .funcw(alu_op), // get the wanted operation from controll
     .clk(clk)
 );
 
@@ -144,7 +144,7 @@ PC pc(
     .pc_output(inst_addr)
 );
 
-always @(negedge rst_b,posedge clk,posedge halted_wire) begin
+always @(posedge clk or negedge rst_b or posedge halted_wire) begin
     if(rst_b == 0) 
         halted = 0;
     if(halted_wire == 1)
