@@ -93,8 +93,7 @@ ALU alu(
     .zero(zero),
     .alu_result(mem_addr),
     .clk(clk)
-    // .alu_op(alu_op), // get the wanted operation from controll
-// ,.sh.amount(inst[11:7])
+    .alu_op(alu_op), // get the wanted operation from controll
 );
 
 /*
