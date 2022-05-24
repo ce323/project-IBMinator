@@ -62,7 +62,6 @@ regfile regfile(
     .rd_data(rd_data),
     .rd_we(reg_write),
     .clk(clk),
-    .
     .rst_b(rst_b),
     .halted(halted)
 );    
@@ -86,14 +85,15 @@ halted          -->        halted                  : input   1
 wire zero;
 wire [31:0] sign_extend_out = $signed(inst);
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
+wire [5:0] alu_op;
 
 ALU alu(
     .in1(read_data_1),
     .in2(input_2_alu),
     .zero(zero),
     .alu_result(mem_addr),
-    .clk(clk)
     .alu_op(alu_op), // get the wanted operation from controll
+    .clk(clk)
 );
 
 /*
@@ -106,8 +106,7 @@ clk             -->        clk                     : input   1
 ---------------------------------------------------
 */
 
-
-wire [5:0] alu_op; //TODO: maybe delete this
+wire halted_wire;
 
 controll controll(
     .inst(inst[31:26]),
@@ -127,15 +126,14 @@ controll controll(
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
-wire [31:0] jump_address = {PC_plus_4[31:28], 2'b0, inst[25:0]}
+wire [31:0] jump_address = {PC_plus_4[31:28], 2'b0, inst[25:0]};
 // assign jump_address = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
 // mux1 is the mux after "Add" (ALU result)
 wire and_out;
 and(and_out, zero, branch);
-wire [31:0] mux1_out;
-assign mux1_out = and_out ? adder2_out : PC_plus_4;
+wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 
 wire [31:0] jump_address;
 
