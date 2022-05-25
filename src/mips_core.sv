@@ -1,13 +1,13 @@
-module mips_core(
-    inst, //instruction memory drives this
-    inst_addr, // we should declare this here **
-    mem_addr, //alu results drives this
-    mem_data_out, // output of data memory
-    mem_data_in, //read data 2 drives this
-    mem_write_en, // controll declares this
-    halted, // we should declare this here **
-    clk, // input from mips machine
-    rst_b // we should declare this here **
+module mips_core (
+    inst,
+    inst_addr,
+    mem_addr,
+    mem_data_out,
+    mem_data_in,
+    mem_write_en,
+    halted,
+    clk,
+    rst_b
 );
 
 output  [31:0] inst_addr;
@@ -38,13 +38,16 @@ rst_b           -->        reset                   : input   1
 wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 
 wire [31:0] read_data_1;
-wire [31:0] read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_data_in[3]};
+wire [31:0] read_data_2;
+assign mem_data_in[3] = read_data_2 [7:0];
+assign mem_data_in[2] = read_data_2 [15:8];
+assign mem_data_in[1] = read_data_2 [23:16];
+assign mem_data_in[0] = read_data_2 [31:24];
+
 wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
 wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
-
-// mux m(.select(mem_to_reg),.in0(mem_addr),.in1(read_data),.out(rd_data));
 
 regfile regfile(
     .rs_data(read_data_1),
@@ -85,11 +88,10 @@ alu alu(
     .input2w(input_2_alu),
     .zero(zero),
     .out(mem_addr),
-    .funcw(alu_op), // get the wanted operation from controll
+    .funcw(alu_op),
     .clk(clk),
     .rst_b(rst_b),
-    .inst(inst),
-    .a(read_data_1)
+    .inst(inst)
 );
 
 /*
@@ -123,7 +125,6 @@ controll controll(
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
-// assign jump_address = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
 // mux1 is the mux after "Add" (ALU result)
@@ -132,28 +133,19 @@ and(and_out, zero, branch);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
-initial begin
-    $monitor("equlity=%b, equlity2=%b, and=%b, zero=%b", adder2_out == mux1_out, mux1_out == pc_input, and_out, zero);
-end
-
-//program counter
-PC pc(
+pc pc(
     .clk(clk),
     .rst_b(rst_b),
     .pc_input(pc_input),
     .pc_output(inst_addr)
 );
 
-// initial begin
-//     #10000 halted = 1;
-// end
-
 always_latch @(rst_b or halted_wire) begin
     if(rst_b == 0) 
         halted = 0;
+
     if(halted_wire == 1)
         halted = 1;
-    // else halted =1 ; 
 end
 
 endmodule

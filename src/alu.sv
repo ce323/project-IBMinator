@@ -1,15 +1,15 @@
-module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, a);
+module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst);
 	output reg zero;
 	input[31:0] input1w , input2w ;
 	reg [4:0] sh_amountw;
 	input[5:0] funcw;
-    	reg[5:0] func;// this wasnt declared
-	output reg[31:0] out; // if out is needed
+    	reg[5:0] func;
+	output reg[31:0] out;
     input clk, rst_b;
 	reg [4:0] sh_amount;
 	reg[31:0] input1 , input2;
 	reg signed [31:0] hold1 , hold2;
-	input [31:0] inst, a;
+	input [31:0] inst;
     
 	`define xorr 6'b100110
  	`define sll 6'b000000
@@ -35,7 +35,6 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, a);
 	`define I_Type_16_LUI 6'b111101
 	
 
-// posedge clk or negedge rst_b/*input1w or input2w or funcw*/
 	always_latch @(*) begin
 		zero = 0;
 
@@ -64,22 +63,20 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, a);
  		`srlv:
 			out = input2 >> input1;
  		`slt :
-			if(hold1<hold2)
-            begin
+			if(hold1 < hold2)
                 out = 1;
-            end
-			// else beginout = 0;  /// was this a typing error?
-            else out=0;
+            else
+				out=0;
 		`subu :
 			out = input1 - input2;
  		`orr :
-			out = input1 | input2;
+			out = input1 | {16'b0, input2[15:0]};
  		`norr :
 			out = ~(input1 | input2);
 		`add:
-			out = input1 + input2;
+			out = $signed(input1) + $signed(input2);
  		`addiu :
-			out = input1 + input2;
+			out = input1 + {16'b0, input2[15:0]};
 		`mult :
 			out = hold1 * hold2;
   		`div :
@@ -87,43 +84,38 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, a);
   		`andd :
 			out = input1 & input2;
  		`sra :
-			out = input2 >>> sh_amount;
-		`I_Type_6_BEQ : begin
+			out = $signed(input2) >>> sh_amount;
+		`I_Type_6_BEQ: begin
 			if(input1 == input2)
 				zero = 1;
 			else
 				zero = 0;
-			$display(":))) %b",zero);
 			end
-		`I_Type_7_BNE :begin
+		`I_Type_7_BNE: begin
 			if(input1 != input2)
 				zero = 1;
 			else
 				zero = 0;
 		end
-		`I_Type_8_BLEZ : begin
-			if(input1 <= 0)begin
+		`I_Type_8_BLEZ: begin
+			if(input1 <= 0)
 				zero = 1;
-			end
 		end
 		`I_Type_9_BGTZ: begin
-			if(input1>0)begin
+			if(input1>0)
 				zero = 1;
-			end
 		end
 		`I_Type_10_BGEZ: begin
-			if($signed(input1)>=0)begin zero = 1; end
+			if($signed(input1)>=0)
+				zero = 1;
 		end
-		`I_Type_16_LUI: begin
-			out = {input2[15:0] , 16'b000000};
-		end
+		`I_Type_16_LUI:
+			out = {input2[15:0], 16'b0};
 
 		default:
-		begin
-		end
+			begin
+			end
 	endcase
-
-	// $display("1=%x 2=%x, out=%x, func=%b, read_data_2=%x",input1, input2, out, func, a);
 
 end
 

@@ -6,7 +6,6 @@ module controll (
 	
 	jump,
 	branch,
-	// mem_read,
 	mem_write_en,
 	
 	mem_to_reg,
@@ -19,7 +18,6 @@ module controll (
 
 input clk, inst;
 output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, halted;
-// output mem_read;
 
 wire [5:0] inst;
 input  [5:0] func;
@@ -32,7 +30,7 @@ output reg [5:0] alu_op;
 `define SUB_5 6'b100010
 `define SRLV_6 6'b000110
 `define SLT_7 6'b101010
-`define Syscall_8 6'b001100
+`define ANDI_8 6'b001100
 `define SUBU_9 6'b100011
 `define OR_10 6'b100101
 `define NOR_11 6'b100101
@@ -57,13 +55,12 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
-				if (func == `Syscall_8) 
+				if (func == `ANDI_8) 
 					assign halted = 1;
 				else
 					assign halted = 0;
@@ -78,10 +75,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 0;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
 				assign halted = 0;
@@ -95,10 +91,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 0;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 1;
 				assign branch = 0;
 				assign halted = 0;
@@ -113,10 +108,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -132,9 +126,8 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign exte
+				assign alu_src = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -146,14 +139,13 @@ always_latch @(inst) begin
 			end
 //***********************************//
 		//I-Type (3): ANDi
-		`Syscall_8:
+		`ANDI_8:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -167,10 +159,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -184,10 +175,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -201,12 +191,11 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 1;//??
+				assign branch = 1;
 				assign halted = 0;
 
 
@@ -219,12 +208,11 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 1;//??
+				assign branch = 1;
 				assign halted = 0;
 
 				assign alu_op = `I_Type_7_BNE;
@@ -236,12 +224,11 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 1;//??
+				assign branch = 1;
 				assign alu_op = `I_Type_8_BLEZ;
 				assign halted = 0;
 
@@ -252,12 +239,11 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 1;//??
+				assign branch = 1;
 				assign halted = 0;
 
 				assign alu_op = `I_Type_9_BGTZ;
@@ -269,12 +255,11 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
-				assign alu_src = 0; // sign extend
+				assign alu_src = 0;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
-				assign branch = 1;//??
+				assign branch = 1;
 				assign halted = 0;
 
 				assign alu_op = `I_Type_10_BGEZ;
@@ -288,10 +273,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -307,10 +291,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1'bx;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 1'bx;
 				assign mem_write_en = 1;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -324,10 +307,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 1;
 				assign mem_write_en = 0;
-				//assign mem_read = 1;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -341,10 +323,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1'bx;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 1'bx;
 				assign mem_write_en = 1;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -358,10 +339,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -375,10 +355,9 @@ always_latch @(inst) begin
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
-				assign alu_src = 1; // sign extend
+				assign alu_src = 1;
 				assign mem_to_reg = 0;
 				assign mem_write_en = 0;
-				//assign mem_read = 0;
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
@@ -395,8 +374,6 @@ always_latch @(inst) begin
 
 
 endcase
-
-$display("op=%b jump=%b", inst, jump);
 
 end
 endmodule
