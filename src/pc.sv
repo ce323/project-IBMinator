@@ -8,7 +8,7 @@ module PC (
 //     pc_output = 1;
 // end
 
-always @(posedge clk, negedge rst_b) begin
+always_latch @(posedge clk, negedge rst_b) begin
     if(rst_b == 0)
         pc_output <= 0;
     else begin

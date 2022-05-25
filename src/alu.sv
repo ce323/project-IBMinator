@@ -1,4 +1,4 @@
-module alu(input1w , input2w  , out , funcw , zero, clk, rst_b);
+module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, a);
 	output reg zero;
 	input[31:0] input1w , input2w ;
 	reg [4:0] sh_amountw;
@@ -8,115 +8,123 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b);
     input clk, rst_b;
 	reg [4:0] sh_amount;
 	reg[31:0] input1 , input2;
-	reg[5:0] xorr , sll , sllv , srl , sub , srlv , slt , suscall , subu , orr , norr , addu , mult , div , andd , jr , sra , I_Type_6_BEQ ,I_Type_7_BNE ,I_Type_8_BLEZ ,I_Type_9_BGTZ ,I_Type_10_BGEZ,I_Type_16_LUI;
 	reg signed [31:0] hold1 , hold2;
+	input [31:0] inst, a;
     
-	initial begin
-		xorr = 6'b100110;
- 		sll = 6'b000000;
- 		sllv =6'b000100;
- 		srl =6'b000010;
- 		sub =6'b100010;
- 		srlv =6'b000110;
- 		slt =6'b101010;
-		subu =6'b100011;
- 		orr =6'b100101;
- 		norr = 6'b100111;
- 		addu =6'b100001;
-		mult =6'b011000;
-  		div =6'b011010;
-  		andd =6'b100100;
- 		sra = 6'b000011;
-		I_Type_6_BEQ =6'b111000;
-		I_Type_7_BNE =6'b111001;
-		I_Type_8_BLEZ= 6'b111010;
-		I_Type_9_BGTZ =6'b111011;
-		I_Type_10_BGEZ= 6'b111100;
-		I_Type_16_LUI =6'b111101;
-	end
+	`define xorr 6'b100110
+ 	`define sll 6'b000000
+ 	`define sllv 6'b000100
+ 	`define srl 6'b000010
+ 	`define sub 6'b100010
+ 	`define srlv 6'b000110
+ 	`define slt 6'b101010
+	`define subu 6'b100011
+ 	`define orr 6'b100101
+ 	`define norr 6'b100111
+ 	`define addiu 6'b100001
+	`define add  6'b100000
+	`define mult 6'b011000
+  	`define div 6'b011010
+  	`define andd 6'b100100
+ 	`define sra 6'b000011
+	`define I_Type_6_BEQ 6'b111000
+	`define I_Type_7_BNE 6'b111001
+	`define I_Type_8_BLEZ 6'b111010
+	`define I_Type_9_BGTZ 6'b111011
+	`define I_Type_10_BGEZ 6'b111100
+	`define I_Type_16_LUI 6'b111101
+	
 
 // posedge clk or negedge rst_b/*input1w or input2w or funcw*/
-	always @(input1w or input2w or funcw) begin
-
+	always_latch @(*) begin
+		zero = 0;
 
 		input1 = input1w;
 		input2 =  input2w ;
-		sh_amount = sh_amountw;
 		func = funcw;
 
-		sh_amountw[4:0] = input2[10:6];
+		sh_amountw[4:0] = inst[10:6];
+		sh_amount = sh_amountw;
 
 
 		hold1 = input1;
 		hold2 = input2;
-		$display("out= %x :))", out);
+
 		case (func)
-		xorr :
+		`xorr :
 			out = input1 ^ input2;
- 		sll :
-			out = input2 << sh_amount ;
- 		sllv :
+ 		`sll :
+			out = input2 << sh_amount;
+ 		`sllv :
 			out = input2 << input1;
- 		srl :
+ 		`srl :
 			out = input2 >> sh_amount;
- 		sub :
+ 		`sub :
 			out = hold1 - hold2;
- 		srlv:
+ 		`srlv:
 			out = input2 >> input1;
- 		slt :
+ 		`slt :
 			if(hold1<hold2)
             begin
                 out = 1;
             end
 			// else beginout = 0;  /// was this a typing error?
             else out=0;
-		subu :
+		`subu :
 			out = input1 - input2;
- 		orr :
+ 		`orr :
 			out = input1 | input2;
- 		norr :
+ 		`norr :
 			out = ~(input1 | input2);
- 		addu :
+		`add:
 			out = input1 + input2;
-		mult :
+ 		`addiu :
+			out = input1 + input2;
+		`mult :
 			out = hold1 * hold2;
-  		div :
+  		`div :
 			out = hold1 / hold2;
-  		andd :
+  		`andd :
 			out = input1 & input2;
- 		sra :
+ 		`sra :
 			out = input2 >>> sh_amount;
-		I_Type_6_BEQ :begin
-			if(input1 == input2)begin zero = 1;end end
-		I_Type_7_BNE :begin
-			if(input1 != input2)begin zero = 1;end
+		`I_Type_6_BEQ : begin
+			if(input1 == input2)
+				zero = 1;
+			else
+				zero = 0;
+			$display(":))) %b",zero);
+			end
+		`I_Type_7_BNE :begin
+			if(input1 != input2)
+				zero = 1;
+			else
+				zero = 0;
 		end
-		I_Type_8_BLEZ : begin
+		`I_Type_8_BLEZ : begin
 			if(input1 <= 0)begin
 				zero = 1;
 			end
 		end
-		I_Type_9_BGTZ: begin
+		`I_Type_9_BGTZ: begin
 			if(input1>0)begin
 				zero = 1;
 			end
 		end
-		I_Type_10_BGEZ: begin
+		`I_Type_10_BGEZ: begin
 			if($signed(input1)>=0)begin zero = 1; end
 		end
-		I_Type_16_LUI: begin
+		`I_Type_16_LUI: begin
 			out = {input2[15:0] , 16'b000000};
+		end
+
+		default:
+		begin
 		end
 	endcase
 
-	if(out == 0)begin
-		zero = 1;
-	end
-	else begin
-	     zero = 0;
-	end
+	// $display("1=%x 2=%x, out=%x, func=%b, read_data_2=%x",input1, input2, out, func, a);
 
 end
-
 
 endmodule

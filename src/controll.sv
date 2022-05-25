@@ -41,6 +41,7 @@ output reg [5:0] alu_op;
 `define DIV_14 6'b011010
 `define AND_15 6'b100100
 `define ADD_16 6'b100000
+`define SRA_17 6'b000011
 `define I_Type_6_BEQ 6'b111000
 `define I_Type_7_BNE 6'b111001
 `define I_Type_8_BLEZ 6'b111010
@@ -50,9 +51,9 @@ output reg [5:0] alu_op;
 
 
 
-always @(inst) begin
+always_latch @(inst) begin
 	case(inst)
-		6'b000000:
+		`SLL_2:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 1;
@@ -65,15 +66,15 @@ always @(inst) begin
 				if (func == `Syscall_8) 
 					assign halted = 1;
 				else
-					assign halted = 0;	
-
+					assign halted = 0;
+				
 				assign alu_op = func;
 
 			end
 
 
 		
-		6'b000010:
+		`SRL_4:
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 0;
@@ -90,7 +91,7 @@ always @(inst) begin
 			end
 
 		//J-Type (2): JAL
-		6'b000011:
+		`SRA_17:
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 0;
@@ -145,7 +146,7 @@ always @(inst) begin
 			end
 //***********************************//
 		//I-Type (3): ANDi
-		6'b001100:
+		`Syscall_8:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
@@ -196,7 +197,7 @@ always @(inst) begin
 			end	
 //***********************************//
 		//I-Type (6): BEQ
-		6'b000100:
+		`SLLV_3:
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
@@ -231,7 +232,7 @@ always @(inst) begin
 			end	
 //***********************************//
 		//I-Type (8): BLEZ
-		6'b000110:
+		`SRLV_6:
 			begin
 				assign reg_write = 0;
 				assign reg_dst = 1;
@@ -283,7 +284,7 @@ always @(inst) begin
 			end
 //***********************************//
 		//I-Type (11): LW
-		6'b100011:
+		`SUBU_9:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
@@ -319,7 +320,7 @@ always @(inst) begin
 			end	
 //***********************************//
 		//I-Type (13): LB
-		6'b100000:
+		`ADD_16:
 			begin
 				assign reg_write = 1;
 				assign reg_dst = 0;
@@ -394,5 +395,8 @@ always @(inst) begin
 
 
 endcase
+
+$display("op=%b jump=%b", inst, jump);
+
 end
 endmodule

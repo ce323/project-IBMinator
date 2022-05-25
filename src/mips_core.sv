@@ -42,10 +42,9 @@ wire [31:0] read_data_2 = {mem_data_in[0], mem_data_in[1], mem_data_in[2], mem_d
 wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data ;
-// = mem_to_reg ? read_data : mem_addr;
+wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
 
-mux m(.select(mem_to_reg),.in0(mem_addr),.in1(read_data),.out(rd_data));
+// mux m(.select(mem_to_reg),.in0(mem_addr),.in1(read_data),.out(rd_data));
 
 regfile regfile(
     .rs_data(read_data_1),
@@ -81,10 +80,6 @@ wire [31:0] sign_extend_out = {{16{inst[15]}}, inst[15:0]};
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
-initial begin
-    $monitor("mem_addr=%x", mem_addr);
-end
-
 alu alu(
     .input1w(read_data_1),
     .input2w(input_2_alu),
@@ -92,7 +87,9 @@ alu alu(
     .out(mem_addr),
     .funcw(alu_op), // get the wanted operation from controll
     .clk(clk),
-    .rst_b(rst_b)
+    .rst_b(rst_b),
+    .inst(inst),
+    .a(read_data_1)
 );
 
 /*
@@ -125,7 +122,7 @@ controll controll(
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
-wire [31:0] jump_address = {PC_plus_4[31:28], 2'b0, inst[25:0]};
+wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
 // assign jump_address = {inst[25:0],1'b0,1'b0,PC_plus_4[31:28]};
 
 
@@ -135,6 +132,10 @@ and(and_out, zero, branch);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
+initial begin
+    $monitor("equlity=%b, equlity2=%b, and=%b, zero=%b", adder2_out == mux1_out, mux1_out == pc_input, and_out, zero);
+end
+
 //program counter
 PC pc(
     .clk(clk),
@@ -142,6 +143,10 @@ PC pc(
     .pc_input(pc_input),
     .pc_output(inst_addr)
 );
+
+// initial begin
+//     #10000 halted = 1;
+// end
 
 always_latch @(rst_b or halted_wire) begin
     if(rst_b == 0) 
