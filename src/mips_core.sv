@@ -46,6 +46,18 @@ assign mem_data_in[0] = read_data_2 [31:24];
 
 wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
+
+// mem data out ==> cache ==> read data
+// 
+
+cache cache(
+    .address(mem_addr),
+    .write_data(read_data_2),
+    .read_data(read_data),
+    .write_en(mem_write_en),
+    .mem_data_out(mem_data_out)
+);
+
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
 wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
 
@@ -139,6 +151,8 @@ pc pc(
     .pc_input(pc_input),
     .pc_output(inst_addr)
 );
+
+
 
 always_latch @(rst_b or halted_wire) begin
     if(rst_b == 0) 
