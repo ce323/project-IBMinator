@@ -37,25 +37,30 @@ rst_b           -->        reset                   : input   1
 // controll outputs
 wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 
-wire [31:0] read_data_1;
-wire [31:0] read_data_2;
-assign mem_data_in[3] = read_data_2 [7:0];
-assign mem_data_in[2] = read_data_2 [15:8];
-assign mem_data_in[1] = read_data_2 [23:16];
-assign mem_data_in[0] = read_data_2 [31:24];
+// wire [31:0] read_data_1;
+// wire [31:0] read_data_2;
+// assign mem_data_in[3] = read_data_2 [7:0];
+// assign mem_data_in[2] = read_data_2 [15:8];
+// assign mem_data_in[1] = read_data_2 [23:16];
+// assign mem_data_in[0] = read_data_2 [31:24];
 
-wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+// wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 
 // mem data out ==> cache ==> read data
 // 
 
 cache cache(
-    .address(mem_addr),
-    .write_data(read_data_2),
-    .read_data(read_data),
-    .write_en(mem_write_en),
-    .mem_data_out(mem_data_out)
+    .address_input(cache_adr_input), // address that goes into cache generated from alu
+    .address_output(mem_addr), // address that cache gives to memory
+    .read_data2(read_data2), // input of cache 
+    .read_data(read_data), // output of cache
+    .mem_data_in(mem_data_in), // output of cache to memory
+    .mem_data_out(mem_data_out), // output of memory to cache
+    .write_en_in(write_signal), // input signal of write or read to cache
+    .write_en_out(mem_write_en),
+    .clk(clk),
+    .reset(rst)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
@@ -99,7 +104,7 @@ alu alu(
     .input1w(read_data_1),
     .input2w(input_2_alu),
     .zero(zero),
-    .out(mem_addr),
+    .out(cache_adr_input), // goes in cache 
     .funcw(alu_op),
     .clk(clk),
     .rst_b(rst_b),
@@ -126,7 +131,7 @@ controll controll(
     .branch(branch),
     .mem_to_reg(mem_to_reg),
     .alu_op(alu_op),
-    .mem_write_en(mem_write_en),
+    .mem_write_en(write_signal),
     .alu_src(alu_src),
     .reg_write(reg_write),
     .clk(clk),
