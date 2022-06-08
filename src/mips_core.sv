@@ -37,21 +37,22 @@ rst_b           -->        reset                   : input   1
 // controll outputs
 wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 
-// wire [31:0] read_data_1;
-// wire [31:0] read_data_2;
+wire [31:0] read_data_1;
+wire [31:0] read_data_2;
 // assign mem_data_in[3] = read_data_2 [7:0];
 // assign mem_data_in[2] = read_data_2 [15:8];
 // assign mem_data_in[1] = read_data_2 [23:16];
 // assign mem_data_in[0] = read_data_2 [31:24];
 
-// wire [31:0] read_data = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+wire [31:0] read_data;// = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
 
 
 // mem data out ==> cache ==> read data
 // 
 
-wire hit;
+wire hit, cache_done, write_signal;
 wire cache_done;
+wire [31:0] cache_adr_input;
 
 cache cache(
     .address_input(cache_adr_input),              // address that goes into cache generated from alu
@@ -65,7 +66,7 @@ cache cache(
     .hit(hit),
     .clk(clk), 
     .cache_done(cache_done),
-    .reset(rst)
+    .reset(rst_b)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];

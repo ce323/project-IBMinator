@@ -29,9 +29,9 @@ module cache #(
 input [31:0] read_data_2;
 output reg [31:0] read_data;
 input   [7:0]  mem_data_out [0:3];
-output  reg [7:0]  mem_data_in [0:3];
+output [7:0]  mem_data_in [0:3];
 input  [31:0] address_input;
-output  reg [31:0] address_output;
+output  [31:0] address_output;
 input write_en_in;
 output reg write_en_out;
 input clk, reset;
@@ -43,7 +43,7 @@ output reg cache_done;
 reg [31:0] block [BLOCKS]; // our cache system consisting of a dirty bit, a valid bit, a tag and a data array
 reg [18:0] tag   [BLOCKS];
 reg valid_bit    [BLOCKS];
-reg dirty_bit    [BLOCKS];
+reg dirty        [BLOCKS];
 
 reg [31:0] this_block; // temporary registers
 reg [18:0] this_tag;
@@ -53,19 +53,31 @@ reg this_dirty;
 reg [10:0] line_num;                                    // find the wanted line number in the cache
 reg [18:0] tag_num;
 
-integer i;
+integer i, j;
 
 assign address_output = address_input;                  //address output is the same as input
 
+reg [7:0] dummy [0:3];
+assign mem_data_in[3] = dummy[3];
+assign mem_data_in[2] = dummy[2];
+assign mem_data_in[1] = dummy[1];
+assign mem_data_in[0] = dummy[0];
 
-always @(negedge reset) begin
-    for (i = 0; i < BLOCKS; i = i + 1) begin
+always_ff @(negedge reset) begin
+    j = 0;
+
+    for (i = 0; i < BLOCKS; i += 1) begin
         valid_bit[i] = 0;
-        dirty_bit[i] = 0;
+        dirty[i] = 0;
     end
 end
 
 always @(posedge clk) begin
+    j += 1;
+end
+
+always_latch @(posedge clk) begin
+    $display("j3 = %d", j);
     cache_done = 0;
     hit = 0;
     i = 0;
@@ -75,9 +87,8 @@ always @(posedge clk) begin
     this_tag = tag[line_num];                        // get the tag of the wanted block
 
 
-
     if(valid_bit[line_num] == 1) begin
-        if(write_en_in == 1) begin
+        if (write_en_in == 1) begin
             if (this_tag == tag_num) begin
                 // this_block = read_data_2;
                 // block[line_num] = this_block;
@@ -85,9 +96,35 @@ always @(posedge clk) begin
                 dirty[line_num] = 1;
                 hit = 1;
             end else begin
-                write_to_mem;
-                read_from_mem;
-                dirty_bit[line_num] = 0;
+                // write_to_mem;
+                if (dirty[line_num] == 1) begin
+                this_block = block[line_num];
+                write_en_out = 1;
+                dummy[3] = this_block [7:0];
+                dummy[2] = this_block [15:8];
+                dummy[1] = this_block [23:16];
+                dummy[0] = this_block [31:24];
+
+                while (j < 5) begin
+                    $display("j1 = %d", j);
+                end
+                // j = 0;
+                $display("j2 = %d", j);
+                // for (i = 0; i < 5; i += 1)
+                    @(posedge clk) $display("j1");
+                end
+                // read_from_mem;
+                write_en_out = 0;
+                while (j < 5) begin   
+                end
+                // j = 0;
+                // for (i = 0; i < 4; i += 1)
+                //      @(posedge clk)
+                // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+                // block[line_num] = this_block;
+                block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+        
+                dirty[line_num] = 0;
                end
         end else begin
                 if(this_tag == tag_num) begin
@@ -95,12 +132,38 @@ always @(posedge clk) begin
                     read_data = block[line_num];
                     hit = 1;
                 end else begin
-                write_to_mem;
-                read_from_mem;
-                @(posedge clk)
+                // write_to_mem;
+                if (dirty[line_num] == 1) begin
+                this_block = block[line_num];
+                write_en_out = 1;
+                dummy[3] = this_block [7:0];
+                dummy[2] = this_block [15:8];
+                dummy[1] = this_block [23:16];
+                dummy[0] = this_block [31:24];
+                while (j < 5) begin   
+                end
+                // j = 0;
+                // for (i = 0; i < 5; i += 1)
+                //     @(posedge clk)
+                end
+                // read_from_mem;
+                write_en_out = 0;
+                while (j < 5) begin   
+                end
+                // j = 0;
+                // for (i = 0; i < 4; i += 1)
+                //      @(posedge clk)
+                // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+                // block[line_num] = this_block;
+                block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+
+                while (j < 1) begin   
+                end
+                // j = 0;
+                // @(posedge clk)
                 // read_data = this_block;
                 read_data = block[line_num];
-                dirty_bit[line_num] = 0;
+                dirty[line_num] = 0;
             end
         end 
         tag[line_num] = tag_num;
@@ -110,10 +173,22 @@ always @(posedge clk) begin
             // block[line_num] = this_block;
             block[line_num] = read_data_2;
             dirty[line_num] = 1;
-        end
-        else begin
-            read_from_mem;
-            @(posedge clk)
+        end else begin
+            // read_from_mem;
+            write_en_out = 0;
+            while (j < 5) begin   
+            end
+            // j = 0;
+            // for (i = 0; i < 4; i += 1)
+            //      @(posedge clk)
+            // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+            // block[line_num] = this_block;
+            block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+
+            while (j < 1) begin   
+            end
+            // j = 0;
+            // @(posedge clk)
             // read_data = this_block;
             read_data = block[line_num];
         end     
@@ -121,33 +196,34 @@ always @(posedge clk) begin
          tag[line_num] = tag_num;
     end
     cache_done = 1;
+    // j = 0;
 end
 
 
-function read_from_mem (input a);
-    begin
-        write_en_out = 0;
-        for (i = 0; i < 4; i += 1)
-             @(posedge clk);
-        // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-        // block[line_num] = this_block;
-        block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-    end
-endfunction
+// function read_from_mem (input a);
+//     begin
+//         write_en_out = 0;
+//         for (i = 0; i < 4; i += 1)
+//              @(posedge clk);
+//         // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+//         // block[line_num] = this_block;
+//         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+//     end
+// endfunction
 
-function write_to_mem (input a);
-    begin
-        if (dirty[line_num] == 1) begin
-           this_block = block[line_num];
-           write_en_out = 1;
-           mem_data_in[3] = this_block [7:0];
-           mem_data_in[2] = this_block [15:8];
-           mem_data_in[1] = this_block [23:16];
-           mem_data_in[0] = this_block [31:24];
-           for (i = 0; i < 5; i += 1)
-                @(posedge clk);
-        end
-   end
-endfunction
+// function write_to_mem (input a);
+//     begin
+//         if (dirty[line_num] == 1) begin
+//            this_block = block[line_num];
+//            write_en_out = 1;
+//            mem_data_in[3] = this_block [7:0];
+//            mem_data_in[2] = this_block [15:8];
+//            mem_data_in[1] = this_block [23:16];
+//            mem_data_in[0] = this_block [31:24];
+//            for (i = 0; i < 5; i += 1)
+//                 @(posedge clk);
+//         end
+//    end
+// endfunction
 
 endmodule
