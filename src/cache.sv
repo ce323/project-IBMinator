@@ -28,13 +28,13 @@ module cache #(
 
 input [31:0] read_data_2;
 output reg [31:0] read_data;
-input   [7:0]  mem_data_out[0:3];
-output  reg [7:0]  mem_data_in[0:3];
+input   [7:0]  mem_data_out [0:3];
+output  reg [7:0]  mem_data_in [0:3];
 input  [31:0] address_input;
 output  reg [31:0] address_output;
 input write_en_in;
 output reg write_en_out;
-input clk;
+input clk, reset;
 output reg hit;
 output reg cache_done;
 
@@ -124,18 +124,18 @@ always @(posedge clk) begin
 end
 
 
-function read_from_mem;
+function read_from_mem (input a);
     begin
         write_en_out = 0;
         for (i = 0; i < 4; i += 1)
-             @(posedge clk)
+             @(posedge clk);
         // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
         // block[line_num] = this_block;
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
     end
 endfunction
 
-function write_to_mem;
+function write_to_mem (input a);
     begin
         if (dirty[line_num] == 1) begin
            this_block = block[line_num];
@@ -144,8 +144,8 @@ function write_to_mem;
            mem_data_in[2] = this_block [15:8];
            mem_data_in[1] = this_block [23:16];
            mem_data_in[0] = this_block [31:24];
-           for (i = 0; i < 5 ; i += 1)
-                @(posedge clk)
+           for (i = 0; i < 5; i += 1)
+                @(posedge clk);
         end
    end
 endfunction
