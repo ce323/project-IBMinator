@@ -64,13 +64,13 @@ cache cache(
     .write_en_out(mem_write_en),                  // output signal to main memory to write or read
     .hit(hit),
     .clk(clk), 
-    .rd_data(rd_data),
-    .mem_to_reg(mem_to_reg),
+    // .rd_data(rd_data),
+    // .mem_to_reg(mem_to_reg),
     .reset(rst)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data; //does it need delay because we need 4 cycles for it to finish????
+wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr; //does it need delay because we need 4 cycles for it to finish????
 
 // always @(posedge clk??????????????????????????) begin
 //     if(hit==0) begin

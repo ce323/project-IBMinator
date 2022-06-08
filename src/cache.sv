@@ -14,17 +14,17 @@ module cache #(
 ) (
     address_input, // address that goes into cache generated from alu
     address_output, // address that cache gives to memory
-    read_data_2, // input of cache 
+    read_data_2, // input of cache
     read_data, // output of cache
     mem_data_in, // output of cache to memory
     mem_data_out, // output of memory to cache
     write_en_in, // input signal of write or read to cache
     write_en_out, // output signal to memory
     hit,
-    mem_to_reg,
-    rd_data,
+    // mem_to_reg,
+    // rd_data,
     clk,
-    reset,
+    reset
 );
 
 input [31:0] read_data_2;
@@ -36,9 +36,9 @@ output  reg [31:0] address_output;
 input write_en_in;
 output reg write_en_out;
 input clk;
-output reg [31:0] rd_data;
+// output reg [31:0] rd_data;
 output reg hit;
-output reg mem_to_reg;
+// output reg mem_to_reg;
 
 
 //     assign rd_data = mem_to_reg ? read_data : mem_addr; // old way
@@ -72,7 +72,14 @@ end
                                                        // **still having thoughts about read and write signals**
 
 
-always_ff @(posedge clk,negedge reset) begin
+always_ff @(posedge clk, negedge reset) begin
+
+    if (reset == 0) begin
+        for (i = 0; i < BLOCKS; i = i + 1) begin
+            valid_bit[i] = 0;
+            dirty_bit[i] = 0;
+        end
+    end
 
     i = 0;
     line_num = address_input[12:2];                  // get and store the block number from input address
@@ -84,28 +91,65 @@ always_ff @(posedge clk,negedge reset) begin
 
     if(valid_bit[line_num] == 1) begin            //it is a valid bit
         if(write_en_in == 1) begin                  // we should write in this block
-            this_block = read_data_2;                // write the data in this block                
-            block[line_num] = this_block;           //  write the block to the cache
-            write_en_out = 1;                       // enable the write signal for the memory
-            mem_data_in[3] = read_data_2 [7:0];     // write the data in the memory
-            mem_data_in[2] = read_data_2 [15:8];
-            mem_data_in[1] = read_data_2 [23:16];
-            mem_data_in[0] = read_data_2 [31:24];
-            for (i = 0 ; i<4 ; i+=1 ) begin         // dont know if it should be #4 or this
-                 @(posedge clk)                                   // empty for only for showing cycles    
-            end                                     // we need 4 cycles for the memory to finish and then we can disable the write signal
-        end
-        else begin                                  // we should read from this block and search
-            if(this_tag == tag_num) begin           // if the tag is the same, we can read from this block
-                read_data = this_block;
-            end 
-            else begin                                // if the tag is not the same, we need to get data and overwrite the data
-                write_en_out = 0;                     // enable the read signal from memory
-                for (i = 0 ; i<4 ; i+=1 ) begin       // dont know if it should be #4 or this  
-                    @(posedge clk)                                   // empty for only for showing cycles
-                end                                   // we need to waid 4 cycles for the memory to give us the data
+            if (this_tag == tag_num) begin
+                this_block = read_data_2;                   // write the data in this block
+                block[line_num] = this_block;              //  write the block to the cache
+                dirty[line_num] = 1;                      // set the dirty bit to 1
+
+                for (i = 0 ; i<4 ; i+=1 ) begin                           // dont know if it should be #4 or this  
+                    @(posedge clk)                                                       // empty for only for showing cycles
+                end                                                       // we need to waid 4 cycles for the memory to give us the data
                 this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
                 block[line_num] = this_block;         //  write the block to the cache
+                @(posedge clk)
+                read_data = this_block;               // give read_data the wanted data
+            end else begin
+                if(dirty[line_num] == 1) begin
+                    this_block = read_data_2;                                 // write the data in this block                
+                    block[line_num] = this_block;                             //  write the block to the cache
+                    write_en_out = 1;                                         // enable the write signal for the memory
+                    mem_data_in[3] = read_data_2 [7:0];                       // write the data in the memory
+                    mem_data_in[2] = read_data_2 [15:8];
+                    mem_data_in[1] = read_data_2 [23:16];
+                    mem_data_in[0] = read_data_2 [31:24];
+                    for (i = 0 ; i<5 ; i+=1 ) begin                           // dont know if it should be #4 or this
+                         @(posedge clk)                                       // empty for only for showing cycles    
+                    end                                                       // we need 4 cycles for the memory to finish and then we can disable the write signal
+                end
+                write_en_out = 0;                                         // enable the read signal from memory
+                for (i = 0 ; i<4 ; i+=1 ) begin                           // dont know if it should be #4 or this  
+                    @(posedge clk)                                                       // empty for only for showing cycles
+                end                                                       // we need to waid 4 cycles for the memory to give us the data
+                this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
+                block[line_num] = this_block;         //  write the block to the cache
+                @(posedge clk)
+                read_data = this_block;               // give read_data the wanted data
+            end
+            
+        end else begin                                  // we should read from this block and search
+                if(this_tag == tag_num) begin           // if the tag is the same, we can read from this block
+                    read_data = this_block;
+                end 
+                else begin                                                // if the tag is not the same, we need to get data and overwrite the data
+                    if(dirty[line_num] == 1) begin
+                    //this_block = read_data_2;                                 // write the data in this block                
+                    block[line_num] = this_block;                             //  write the block to the cache
+                    write_en_out = 1;                                         // enable the write signal for the memory
+                    mem_data_in[3] = read_data_2 [7:0];                       // write the data in the memory
+                    mem_data_in[2] = read_data_2 [15:8];
+                    mem_data_in[1] = read_data_2 [23:16];
+                    mem_data_in[0] = read_data_2 [31:24];
+                    for (i = 0 ; i<5 ; i+=1 ) begin                           // dont know if it should be #4 or this
+                         @(posedge clk)                                       // empty for only for showing cycles    
+                    end                                                       // we need 4 cycles for the memory to finish and then we can disable the write signal
+                end
+                write_en_out = 0;                                         // enable the read signal from memory
+                for (i = 0 ; i<4 ; i+=1 ) begin                           // dont know if it should be #4 or this  
+                    @(posedge clk)                                                       // empty for only for showing cycles
+                end                                                       // we need to waid 4 cycles for the memory to give us the data
+                this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
+                block[line_num] = this_block;         //  write the block to the cache
+                @(posedge clk)
                 read_data = this_block;               // give read_data the wanted data
             end 
         end 
@@ -115,14 +159,7 @@ always_ff @(posedge clk,negedge reset) begin
         if(write_en_in == 1) begin                     // we should write in this block
             this_block = read_data_2;                   // write the data in this block                
             block[line_num] = this_block;              //  write the block to the cache
-            write_en_out = 1;                          // enable the write signal for the memory
-            mem_data_in[3] = read_data_2 [7:0];        // write the data in the memory
-            mem_data_in[2] = read_data_2 [15:8];
-            mem_data_in[1] = read_data_2 [23:16];
-            mem_data_in[0] = read_data_2 [31:24];
-            for (i = 0 ; i<4 ; i+=1 ) begin            // dont know if it should be #4 or this
-                 @(posedge clk)                                         // empty for only for showing cycles    
-            end                                        // we need 4 cycles for the memory to finish and then we can disable the write signal
+            dirty[line_num] = 1;                      // set the dirty bit to 1
         end     
         else begin                                     // we should read from this block and search
             write_en_out = 0;                          // enable the read signal from memory
@@ -131,6 +168,7 @@ always_ff @(posedge clk,negedge reset) begin
             end                                        // we need to waid 4 cycles for the memory to give us the data
             this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
             block[line_num] = this_block;              //  write the block to the cache
+            @(posedge clk)
             read_data = this_block;                    // give read_data the wanted data
         end     
          valid_bit[line_num] = 1;                      // set the valid bit to 1

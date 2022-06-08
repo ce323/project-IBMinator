@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Mon May 23 16:19:11 2022
+# Make data base, printed on Wed Jun  8 18:26:47 2022
 
 # Variables
 
@@ -24,13 +24,13 @@ VSCODE_LOG_NATIVE = false
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
- 
 # automatic
 @F = $(notdir $@)
 # makefile
 CURDIR := /Users/AMF/Desktop/project-IBMinator
 # makefile
 SHELL = /bin/sh
+ 
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
@@ -48,7 +48,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-64889ddf-3380-45c1-8be8-2de4b9bae1f1.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-70a0652a-8b04-401d-a322-8599f21dd724.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -60,11 +60,11 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.dntMNtsC1H/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.T9gvXMA0X8/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
-DISPLAY = /private/tmp/com.apple.launchd.MF50QqTc4v/org.xquartz:0
+DISPLAY = /private/tmp/com.apple.launchd.k2C1hHYnYR/org.xquartz:0
 # environment
 CONDA_EXE = /Users/AMF/opt/anaconda3/bin/conda
 # environment
@@ -82,11 +82,11 @@ MEM = $(ASM:%.s=%.mem)
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/da15b6fd3ef856477bf6f4fb29ba1b7af717770d
+VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
 # environment
 LOGNAME = AMF
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 CONDA_PROMPT_MODIFIER = (base) 
 # environment
@@ -124,7 +124,7 @@ TMPDIR = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.67.1-main.sock
+VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.67.2-main.sock
 # makefile
 MAKEFLAGS = Rrqp
 # environment
@@ -164,13 +164,13 @@ MAKELEVEL := 0
 # makefile (from `Makefile', line 7)
 TEST_DIRS = $(wildcard test/**/)
 # environment
- 
 CONDA_PREFIX = /Users/AMF/opt/anaconda3
 # environment
-VSCODE_PID = 15523
+VSCODE_PID = 76753
 # makefile (from `Makefile', line 23)
 INPUT = test/default/addiu
 # environment
+ 
 _CE_CONDA = 
 # environment
 LANG = C
@@ -183,19 +183,14 @@ LANG = C
 
 # Directories
 
-# . (device 16777220, inode 73483839): 12 files, no impossibilities.
-# test/default (device 16777220, inode 73483933): 23 files, no impossibilities.
-# 323src (device 16777220, inode 73483913): 6 files, no impossibilities.
-# src (device 16777220, inode 73483922): 11 files, no impossibilities.
+# . (device 16777220, inode 76435073): 14 files, no impossibilities.
+# test/default (device 16777220, inode 76435178): 26 files, no impossibilities.
+# 323src (device 16777220, inode 76435161): 7 files, no impossibilities.
+# src (device 16777220, inode 76435171): 7 files, no impossibilities.
 
-# 52 files, no impossibilities in 4 directories.
+# 54 files, no impossibilities in 4 directories.
 
 # Implicit Rules
-
-%.elf: %.s
-#  commands to execute (from `Makefile', line 13):
-	mips-linux-gnu-as -march=r6000 $< -o $@
-	
 
 %.bin: %.elf
 #  commands to execute (from `Makefile', line 16):
@@ -207,11 +202,11 @@ LANG = C
 	xxd -p -c1 $< $@
 	
 
-# 3 implicit rules, 0 (0.0%) terminal.
+# 2 implicit rules, 0 (0.0%) terminal.
 
 # Files
 
-obj_dir/Vmips_machine: src/mips_core.sv 323src/memory.sv 323src/mips_machine.sv 323src/regfile.sv 323src/sim_main.cpp
+obj_dir/Vmips_machine: src/alu.sv src/cache.sv src/controll.sv src/mips_core.sv src/pc.sv 323src/dff.sv 323src/memory.sv 323src/mips_machine.sv 323src/regfile.sv 323src/sim_main.cpp
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -228,7 +223,7 @@ clean-mem:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 59):
+#  commands to execute (from `Makefile', line 60):
 	rm -rf $(MEM)
 	
 
@@ -252,7 +247,7 @@ test/default/shifttest.mem:
 #  Modification time never checked.
 #  File has not been updated.
 
-assemble: test/default/addiu.mem test/default/addtest.mem test/default/arithtest.mem test/default/brtest0.mem test/default/brtest2.mem test/default/memtest0.mem test/default/shifttest.mem
+assemble: test/default/addiu.mem test/default/addtest.mem test/default/arithtest.mem test/default/brtest0.mem test/default/brtest2.mem test/default/memtest0.mem test/default/sb.mem test/default/shifttest.mem
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -290,14 +285,38 @@ test/default/addiu.mem:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-23 16:18:32
+#  Last modified 2022-06-08 18:26:37
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 # Not a target:
+src/cache.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+323src/dff.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+src/alu.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
 test/default/brtest0.mem:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+src/controll.sv:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -309,6 +328,7 @@ compile: obj_dir/Vmips_machine
 
 # Not a target:
 323src/sim_main.cpp:
+ 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -325,11 +345,18 @@ sim: compile assemble
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 35):
 	cp ${INPUT}.mem output/instructions.mem
-	./obj_dir/Vmips_machine
+	docker run --entrypoint=/work/obj_dir/Vmips_machine -ti -v ${PWD}:/work \
+	verilator/verilator:latest
 	
 
 # Not a target:
 323src/mips_machine.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/default/sb.mem:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -339,7 +366,7 @@ clean:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 56):
+#  commands to execute (from `Makefile', line 57):
 	rm -rf obj_dir
 	
 
@@ -357,10 +384,9 @@ test/default/arithtest.mem:
 
 verify: sim
 #  Implicit rule search has not been done.
- 
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 39):
+#  commands to execute (from `Makefile', line 40):
 	diff -u ${INPUT}.reg output/regdump.reg 1>&2
 	
 
@@ -380,7 +406,7 @@ verify-all: compile assemble
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 42):
+#  commands to execute (from `Makefile', line 43):
 	@fail=0;																				\
 	for test in `find test -iname '*.mem'`; do												\
 	if ! make verify INPUT=$${test%".mem"}; then fail=$$(expr $$fail + 1); fi;			\
@@ -392,8 +418,14 @@ verify-all: compile assemble
 	fi
 	
 
+# Not a target:
+src/pc.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
 # files hash-table stats:
-# Load=25/1024=2%, Rehash=0, Collisions=0/58=0%
+# Load=31/1024=3%, Rehash=0, Collisions=0/70=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -405,6 +437,6 @@ verify-all: compile assemble
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Mon May 23 16:19:11 2022
+# Finished Make data base on Wed Jun  8 18:26:47 2022
 
  
