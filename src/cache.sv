@@ -20,6 +20,9 @@ module cache #(
     mem_data_out, // output of memory to cache
     write_en_in, // input signal of write or read to cache
     write_en_out, // output signal to memory
+    hit,
+    mem_to_reg,
+    rd_data,
     clk,
     reset,
 );
@@ -33,6 +36,12 @@ output  reg [31:0] address_output;
 input write_en_in;
 output reg write_en_out;
 input clk;
+output reg [31:0] rd_data;
+output reg hit;
+output reg mem_to_reg;
+
+
+//     assign rd_data = mem_to_reg ? read_data : mem_addr; // old way
 
 
 reg [31:0] block [BLOCKS]; // our cache system consisting of a dirty bit, a valid bit, a tag and a data array

@@ -50,6 +50,9 @@ wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 // mem data out ==> cache ==> read data
 // 
 
+wire hit;
+in
+
 cache cache(
     .address_input(cache_adr_input),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
@@ -59,12 +62,24 @@ cache cache(
     .mem_data_out(mem_data_out),                  // input of memory to cache
     .write_en_in(write_signal),                   // input signal of write or read to cache
     .write_en_out(mem_write_en),                  // output signal to main memory to write or read
+    .hit(hit),
     .clk(clk), 
+    .rd_data(rd_data),
+    .mem_to_reg(mem_to_reg),
     .reset(rst)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr; //does it need delay because we need 4 cycles for it to finish????
+wire [31:0] rd_data; //does it need delay because we need 4 cycles for it to finish????
+
+// always @(posedge clk??????????????????????????) begin
+//     if(hit==0) begin
+//         for (i=0; i<4; i = i + 1) begin
+//             @(posedge clk)
+//         end
+//     end
+//     assign rd_data = mem_to_reg ? read_data : mem_addr; // ??????????????????????????????????/
+// end
 
 regfile regfile(
     .rs_data(read_data_1),
