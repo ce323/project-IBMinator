@@ -51,7 +51,6 @@ wire [31:0] read_data;// = {mem_data_out[0], mem_data_out[1], mem_data_out[2], m
 // 
 
 wire hit, cache_done, write_signal;
-wire cache_done;
 wire [31:0] cache_adr_input;
 
 cache cache(
