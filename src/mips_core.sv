@@ -51,20 +51,20 @@ wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 // 
 
 cache cache(
-    .address_input(cache_adr_input), // address that goes into cache generated from alu
-    .address_output(mem_addr), // address that cache gives to memory
-    .read_data2(read_data2), // input of cache 
-    .read_data(read_data), // output of cache
-    .mem_data_in(mem_data_in), // output of cache to memory
-    .mem_data_out(mem_data_out), // output of memory to cache
-    .write_en_in(write_signal), // input signal of write or read to cache
-    .write_en_out(mem_write_en),
-    .clk(clk),
+    .address_input(cache_adr_input),              // address that goes into cache generated from alu
+    .address_output(mem_addr),                    // address that cache gives to memory
+    .read_data2(read_data_2),                     // input data of cache 
+    .read_data(read_data),                        // output of cache
+    .mem_data_in(mem_data_in),                    // output of cache to memory
+    .mem_data_out(mem_data_out),                  // input of memory to cache
+    .write_en_in(write_signal),                   // input signal of write or read to cache
+    .write_en_out(mem_write_en),                  // output signal to main memory to write or read
+    .clk(clk), 
     .reset(rst)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
+wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr; //does it need delay because we need 4 cycles for it to finish????
 
 regfile regfile(
     .rs_data(read_data_1),

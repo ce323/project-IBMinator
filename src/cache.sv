@@ -1,3 +1,13 @@
+// word size = 32 bits
+// instruction size = 13 bits
+// #(blocks) * #(words in block) * #(bytes in word) = cache size in bytes
+// block * 1 * 4 = 8 * 1024 = 8KB -> block_number = 2048 (2 ^ 11) => number_of_digits for selecting block = 11 bits
+// Tag : 19      Block : 11    Word : 0   Au : 2
+// Tag : [31:13] address - Block [12:2] address 
+// dirty = 1 bit , valid = 1 bit
+// blocks * 1 * 
+
+
 module cache #(
     BLOCKS = 2048,
     SIZE = 8 * 1024 //bytes
@@ -40,6 +50,8 @@ reg [18:0] tag_num;
 
 integer i;
 
+assign address_output = address_input;                  //address output is the same as input
+
 
 initial begin
     //make all valid bits 0
@@ -54,31 +66,31 @@ end
 always_ff @(posedge clk,negedge reset) begin
 
     i = 0;
-    line_num = address_input[12:2];                  // this is the block number
-    tag_num = address_input[31:13];                  // this is the tag 
+    line_num = address_input[12:2];                  // get and store the block number from input address
+    tag_num = address_input[31:13];                  // get and store the tag from input address
     this_block = block[line_num];                    // get the wanted block
     this_tag = tag[line_num];                        // get the tag of the wanted block
 
 
 
-    if(valid_bit[this_block] == 1) begin            //it is a valid bit
+    if(valid_bit[line_num] == 1) begin            //it is a valid bit
         if(write_en_in == 1) begin                  // we should write in this block
-            this_block = read_data2;               // write the data in this block                
-            block[line_num] = this_block;          //  write the block to the cache
-            write_en_out = 1;                      // enable the write signal for the memory
-            mem_data_in[3] = read_data_2 [7:0];    // write the data in the memory
+            this_block = read_data2;                // write the data in this block                
+            block[line_num] = this_block;           //  write the block to the cache
+            write_en_out = 1;                       // enable the write signal for the memory
+            mem_data_in[3] = read_data_2 [7:0];     // write the data in the memory
             mem_data_in[2] = read_data_2 [15:8];
             mem_data_in[1] = read_data_2 [23:16];
             mem_data_in[0] = read_data_2 [31:24];
-            for (i = 0 ; i<4 ; i+=1 ) begin       // dont know if it should be #4 or this
-                                                  // empty for only for showing cycles    
-            end                                   // we need 4 cycles for the memory to finish and then we can disable the write signal
+            for (i = 0 ; i<4 ; i+=1 ) begin         // dont know if it should be #4 or this
+                                                    // empty for only for showing cycles    
+            end                                     // we need 4 cycles for the memory to finish and then we can disable the write signal
         end
         else begin                                  // we should read from this block and search
             if(this_tag == tag_num) begin           // if the tag is the same, we can read from this block
-                read_data = this_block[31:0];
+                read_data = this_block;
             end 
-            else begin                             // if the tag is not the same, we need to get data and overwrite the data
+            else begin                                // if the tag is not the same, we need to get data and overwrite the data
                 write_en_out = 0;                     // enable the read signal from memory
                 for (i = 0 ; i<4 ; i+=1 ) begin       // dont know if it should be #4 or this  
                                                       // empty for only for showing cycles
@@ -88,48 +100,36 @@ always_ff @(posedge clk,negedge reset) begin
                 read_data = this_block;               // give read_data the wanted data
             end 
         end 
-         tag[line_num] = tag_num;              // write the tag to the cache
-    end
-    else begin                                     // it is not a valid bit
-        if(write_en_in == 1) begin                 // we should write in this block
-            this_block = read_data2;               // write the data in this block                
-            block[line_num] = this_block;          //  write the block to the cache
-            write_en_out = 1;                      // enable the write signal for the memory
-            mem_data_in[3] = read_data_2 [7:0];    // write the data in the memory
+         tag[line_num] = tag_num;                      // write the tag to the cache
+    end  
+    else begin                                         // it is not a valid bit
+        if(write_en_in == 1) begin                     // we should write in this block
+            this_block = read_data2;                   // write the data in this block                
+            block[line_num] = this_block;              //  write the block to the cache
+            write_en_out = 1;                          // enable the write signal for the memory
+            mem_data_in[3] = read_data_2 [7:0];        // write the data in the memory
             mem_data_in[2] = read_data_2 [15:8];
             mem_data_in[1] = read_data_2 [23:16];
             mem_data_in[0] = read_data_2 [31:24];
-            for (i = 0 ; i<4 ; i+=1 ) begin       // dont know if it should be #4 or this
-                                                  // empty for only for showing cycles    
-            end                                   // we need 4 cycles for the memory to finish and then we can disable the write signal
-        end
-        else begin                                // we should read from this block and search
-            write_en_out = 0;                     // enable the read signal from memory
-            for (i = 0 ; i<4 ; i+=1 ) begin       // dont know if it should be #4 or this  
-                                                  // empty for only for showing cycles
-            end                                   // we need to waid 4 cycles for the memory to give us the data
+            for (i = 0 ; i<4 ; i+=1 ) begin            // dont know if it should be #4 or this
+                                                       // empty for only for showing cycles    
+            end                                        // we need 4 cycles for the memory to finish and then we can disable the write signal
+        end     
+        else begin                                     // we should read from this block and search
+            write_en_out = 0;                          // enable the read signal from memory
+            for (i = 0 ; i<4 ; i+=1 ) begin            // dont know if it should be #4 or this  
+                                                       // empty for only for showing cycles
+            end                                        // we need to waid 4 cycles for the memory to give us the data
             this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
-            block[line_num] = this_block;         //  write the block to the cache
-            read_data = this_block;               // give read_data the wanted data
-        end
-         valid_bit[line_num] = 1;                 // set the valid bit to 1
-         tag[line_num] = tag_num;                 // set the tag to the wanted tag 
+            block[line_num] = this_block;              //  write the block to the cache
+            read_data = this_block;                    // give read_data the wanted data
+        end     
+         valid_bit[line_num] = 1;                      // set the valid bit to 1
+         tag[line_num] = tag_num;                      // set the tag to the wanted tag 
     end
 end
 
 
 
-
-
-
-
-// word size = 32 bits
-// instruction size = 13 bits
-// #(blocks) * #(words in block) * #(bytes in word) = cache size in bytes
-// block * 1 * 4 = 8 * 1024 = 8KB -> block_number = 2048 (2 ^ 11) => number_of_digits for selecting block = 11 bits
-// Tag : 19      Block : 11    Word : 0   Au : 2
-// Tag : [31:13] address - Block [12:2] address 
-// dirty = 1 bit , valid = 1 bit
-// blocks * 1 * 
 
 endmodule
