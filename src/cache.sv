@@ -9,8 +9,8 @@
 
 
 module cache #(
-    BLOCKS = 2048,
-    SIZE = 8 * 1024 //bytes
+    parameter BLOCKS = 2048,
+    parameter SIZE = 8 * 1024 //bytes
 ) (
     address_input, // address that goes into cache generated from alu
     address_output, // address that cache gives to memory
@@ -58,14 +58,14 @@ integer i;
 assign address_output = address_input;                  //address output is the same as input
 
 
-always_ff @(negedge reset) begin
+always @(negedge reset) begin
     for (i = 0; i < BLOCKS; i = i + 1) begin
         valid_bit[i] = 0;
         dirty_bit[i] = 0;
     end
 end
 
-always_ff @(posedge clk) begin
+always @(posedge clk) begin
     cache_done = 0;
     hit = 0;
     i = 0;
@@ -79,9 +79,10 @@ always_ff @(posedge clk) begin
     if(valid_bit[line_num] == 1) begin
         if(write_en_in == 1) begin
             if (this_tag == tag_num) begin
-                this_block = read_data_2;
-                block[line_num] = this_block;              //  write the block to the cache
-                dirty[line_num] = 1;                      // set the dirty bit to 1                                                       // we need to waid 4 cycles for the memory to give us the data
+                // this_block = read_data_2;
+                // block[line_num] = this_block;
+                block[line_num] = read_data_2;
+                dirty[line_num] = 1;
                 hit = 1;
             end else begin
                 write_to_mem;
@@ -103,47 +104,49 @@ always_ff @(posedge clk) begin
             end
         end 
         tag[line_num] = tag_num;
-    end  
-    else begin                                         // ita is not a valid bit
-        if(write_en_in == 1) begin                     // we should write in this block
-            this_block = read_data_2;                   // write the data in this block                
-            block[line_num] = this_block;              //  write the block to the cache
-            dirty[line_num] = 1;                      // set the dirty bit to 1
-        end     
-        else begin                                     // we should read from this block and search
+    end else begin
+        if(write_en_in == 1) begin
+            // this_block = read_data_2;
+            // block[line_num] = this_block;
+            block[line_num] = read_data_2;
+            dirty[line_num] = 1;
+        end
+        else begin
             read_from_mem;
             @(posedge clk)
             // read_data = this_block;
             read_data = block[line_num];
         end     
-         valid_bit[line_num] = 1;                      // set the valid bit to 1
-         tag[line_num] = tag_num;                      // set the tag to the wanted tag 
+         valid_bit[line_num] = 1;
+         tag[line_num] = tag_num;
     end
     cache_done = 1;
 end
 
 
-
-
 function read_from_mem;
-    write_en_out = 0;                                         // enable the read signal from memory
-    for (i = 0; i < 4; i += 1)                           // dont know if it should be #4 or this  
-         @(posedge clk)                                 // empty for only for showing cycles
-    this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]}; // write the data in this block
-    block[line_num] = this_block;         //  write the block to the cache
+    begin
+        write_en_out = 0;
+        for (i = 0; i < 4; i += 1)
+             @(posedge clk)
+        // this_block = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+        // block[line_num] = this_block;
+        block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
+    end
 endfunction
 
 function write_to_mem;
-    if(dirty[line_num] == 1) begin                                // write the data in this block
-       this_block = block[line_num];                             //  write the block to the cache
-       write_en_out = 1;                                         // enable the write signal for the memory
-       mem_data_in[3] = this_block [7:0];                       // write the data in the memory
-       mem_data_in[2] = this_block [15:8];
-       mem_data_in[1] = this_block [23:16];
-       mem_data_in[0] = this_block [31:24];
-       for (i = 0; i < 5 ; i += 1)                                 // dont know if it should be #4 or this
-            @(posedge clk)                                       // empty for only for showing cycles    
-                                                                 // we need 4 cycles for the memory to finish and then we can disable the write signal
+    begin
+        if (dirty[line_num] == 1) begin
+           this_block = block[line_num];
+           write_en_out = 1;
+           mem_data_in[3] = this_block [7:0];
+           mem_data_in[2] = this_block [15:8];
+           mem_data_in[1] = this_block [23:16];
+           mem_data_in[0] = this_block [31:24];
+           for (i = 0; i < 5 ; i += 1)
+                @(posedge clk)
+        end
    end
 endfunction
 
