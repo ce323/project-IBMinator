@@ -53,7 +53,7 @@ wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
 cache cache(
     .address_input(cache_adr_input),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
-    .read_data2(read_data_2),                     // input data of cache 
+    .read_data_2(read_data_2),                     // input data of cache 
     .read_data(read_data),                        // output of cache
     .mem_data_in(mem_data_in),                    // output of cache to memory
     .mem_data_out(mem_data_out),                  // input of memory to cache
