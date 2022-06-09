@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Wed Jun  8 21:35:53 2022
+
+# Make data base, printed on Thu Jun  9 09:51:53 2022
 
 # Variables
 
@@ -44,23 +47,26 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-ae8f40cc-b35e-4c04-a449-90ee56d5303a.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-d2ee3a01-00e2-404c-9cfa-09da00426926.sock
 # environment
 VSCODE_CWD = /
 # environment
 PATH = /Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/local/bin:/opt/local/sbin:/Users/AMF/opt/anaconda3/bin:/Users/AMF/opt/anaconda3/condabin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/share/dotnet:/opt/X11/bin:~/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 # environment
+LaunchInstanceID = C08260E5-F327-4596-A8ED-B6D3F17F3EB1
+# environment
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
+ 
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.T9gvXMA0X8/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.ObJDrJLg4s/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
-DISPLAY = /private/tmp/com.apple.launchd.k2C1hHYnYR/org.xquartz:0
+DISPLAY = /private/tmp/com.apple.launchd.vlysod0gve/org.xquartz:0
 # environment
 CONDA_EXE = /Users/AMF/opt/anaconda3/bin/conda
 # environment
@@ -82,7 +88,7 @@ VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/
 # environment
 LOGNAME = AMF
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 CONDA_PROMPT_MODIFIER = (base) 
 # environment
@@ -147,6 +153,8 @@ MAKEFILES :=
 LC_ALL = C
 # environment
 CONDA_PYTHON_EXE = /Users/AMF/opt/anaconda3/bin/python
+# environment
+SECURITYSESSIONID = 186a4
 # automatic
 ^F = $(notdir $^)
 # default
@@ -162,7 +170,7 @@ TEST_DIRS = $(wildcard test/**/)
 # environment
 CONDA_PREFIX = /Users/AMF/opt/anaconda3
 # environment
-VSCODE_PID = 76753
+VSCODE_PID = 505
 # makefile (from `Makefile', line 23)
 INPUT = test/default/addiu
 # environment
@@ -170,7 +178,7 @@ _CE_CONDA =
 # environment
 LANG = C
 # variable set hash-table stats:
-# Load=79/1024=8%, Rehash=0, Collisions=2/106=2%
+# Load=81/1024=8%, Rehash=0, Collisions=2/108=2%
 
 # Pattern-specific Variable Values
 
@@ -178,12 +186,12 @@ LANG = C
 
 # Directories
 
-# . (device 16777220, inode 76435073): 14 files, no impossibilities.
+# . (device 16777220, inode 76435073): 15 files, no impossibilities.
 # test/default (device 16777220, inode 76435178): 26 files, no impossibilities.
 # 323src (device 16777220, inode 76435161): 7 files, no impossibilities.
-# src (device 16777220, inode 76435171): 7 files, no impossibilities.
+# src (device 16777220, inode 76435171): 8 files, no impossibilities.
 
-# 54 files, no impossibilities in 4 directories.
+# 56 files, no impossibilities in 4 directories.
 
 # Implicit Rules
 
@@ -267,6 +275,7 @@ test/default/memtest0.mem:
 
 # Not a target:
 .SUFFIXES:
+ 
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -297,9 +306,6 @@ src/cache.sv:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
- 
-make: *** No rule to make target `all'.  Stop.
 
 # Not a target:
 src/alu.sv:
@@ -434,6 +440,6 @@ src/pc.sv:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Jun  8 21:35:53 2022
+# Finished Make data base on Thu Jun  9 09:51:53 2022
 
  

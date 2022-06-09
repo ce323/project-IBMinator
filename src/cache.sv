@@ -74,20 +74,82 @@ always @(negedge reset) begin
 end
 
 reg states [5:0];
-reg dirty_bit;
+reg dirty_bit, isStateOneExist;
+
 always @(posedge clk) begin
-    $display("j = %d", j);
+    hit = 0;
+    i = 0;
+    line_num = address_input[12:2];                  // get and store the block number from input address
+    tag_num = address_input[31:13];                  // get and store the tag from input address
+    this_block = block[line_num];                    // get the wanted block
+    this_tag = tag[line_num];                        // get the tag of the wanted block
+    
+    isStateOneExist = 0;
     for (i = 0; i < 6; i += 1) begin
         if (states[i]) begin
-            $display("states[%d]", i);
+            isStateOneExist = 1;
             break;
+        end
+    end
+
+    $display("valid=%d ,write_en_in=%d ,equality_tag=%d ,dirty=%d ,j=%d", valid_bit[line_num], write_en_in, (this_tag == tag_num), dirty[line_num], j);
+    if (!isStateOneExist) begin
+        if(valid_bit[line_num] == 1) begin
+        if (write_en_in == 1) begin
+            if (this_tag == tag_num) begin
+                states[0] = 1;
+                block[line_num] = read_data_2;
+                dirty[line_num] = 1;
+                hit = 1;
+                j = -1;
+                cache_done = 1;
+                for (i = 0; i < 6; i += 1)
+                    states[i] = 0;
+            end else begin
+                states[1] = 1;
+               end
+        end else begin
+                if(this_tag == tag_num) begin
+                    states[2] = 1;
+                    read_data = block[line_num];
+                    hit = 1;
+                    cache_done = 1;
+                    j = -1;
+                    for (i = 0; i < 6; i += 1)
+                        states[i] = 0;
+                end else begin
+                    states[3] = 1;
+                end
+        end 
+        tag[line_num] = tag_num;
+    end else begin
+        if(write_en_in == 1) begin
+            states[4] = 1;
+            block[line_num] = read_data_2;
+            dirty[line_num] = 1;
+            valid_bit[line_num] = 1;
+            tag[line_num] = tag_num;
+            cache_done = 1;
+            j = -1;
+            for (i = 0; i < 6; i += 1)
+                states[i] = 0;
+        end else begin
+            states[5] = 1;
+        end
+    end
+    end
+
+    for (i = 0; i < 6; i += 1) begin
+        if (states[i]) begin
+            $display("%d", i);
         end
     end
     dirty_bit = dirty[line_num];
 
-    if (states[5] && j == 0)
+    if (states[5] && j == 0) begin
+        cache_done = 0;
         write_en_out = 0;
-    else if (states[5] && j == 4)
+    end else if (states[5] && j == 4)
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
     else if (states[5] && j == 5) begin
         read_data = block[line_num];
@@ -95,9 +157,12 @@ always @(posedge clk) begin
         tag[line_num] = tag_num;
         j = -1;
         cache_done = 1;
+        for (i = 0; i < 6; i += 1)
+            states[i] = 0;
     end
     
     else if (states[3] && j == 0 && dirty_bit) begin
+        cache_done = 0;
         this_block = block[line_num];
         write_en_out = 1;
         dummy[3] = this_block [7:0];
@@ -113,9 +178,12 @@ always @(posedge clk) begin
         dirty[line_num] = 0;
         j = -1;
         cache_done = 1;
+        for (i = 0; i < 6; i += 1)
+            states[i] = 0;
     end
 
     else if (states[1] && j == 0 && dirty_bit) begin
+        cache_done = 0;
         this_block = block[line_num];
         write_en_out = 1;
         dummy[3] = this_block [7:0];
@@ -129,118 +197,11 @@ always @(posedge clk) begin
         dirty[line_num] = 0;
         j = -1;
         cache_done = 1;
+        for (i = 0; i < 6; i += 1)
+             states[i] = 0;
     end
     
-
     j += 1;
-end
-
-always @(posedge clk) begin
-    hit = 0;
-    i = 0;
-    line_num = address_input[12:2];                  // get and store the block number from input address
-    tag_num = address_input[31:13];                  // get and store the tag from input address
-    this_block = block[line_num];                    // get the wanted block
-    this_tag = tag[line_num];                        // get the tag of the wanted block
-
-    // $display("valid=%d write_en_in=%d equality_tag=%d dirty=%d", valid_bit[line_num], write_en_in, (this_tag == tag_num), dirty[line_num]);
-    if(valid_bit[line_num] == 1) begin
-        if (write_en_in == 1) begin
-            if (this_tag == tag_num) begin
-                block[line_num] = read_data_2;
-                dirty[line_num] = 1;
-                hit = 1;
-                cache_done = 1;
-            end else begin
-                for (i = 0; i < 6; i += 1) begin
-                    states[i] = 0;
-                end
-                states[1] = 1;
-                cache_done = 0;
-                /*
-                if (dirty[line_num] == 1) begin
-                this_block = block[line_num];
-                write_en_out = 1;
-                dummy[3] = this_block [7:0];
-                dummy[2] = this_block [15:8];
-                dummy[1] = this_block [23:16];
-                dummy[0] = this_block [31:24];
-                // for (i = 0; i < 5; i += 1)
-                    // @(posedge clk)
-                end
-                */
-                /*write_en_out = 0;*/
-                // for (i = 0; i < 4; i += 1)
-                //      @(posedge clk)
-                /*
-                block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-        
-                dirty[line_num] = 0;
-                */
-               end
-        end else begin
-                if(this_tag == tag_num) begin
-                    read_data = block[line_num];
-                    hit = 1;
-                    cache_done = 1;
-                end else begin
-                    for (i = 0; i < 6; i += 1) begin
-                        states[i] = 0;
-                    end
-                    states[3] = 1;
-                    cache_done = 0;
-                    /*
-                    if (dirty[line_num] == 1) begin
-                    this_block = block[line_num];
-                    write_en_out = 1;
-                    dummy[3] = this_block [7:0];
-                    dummy[2] = this_block [15:8];
-                    dummy[1] = this_block [23:16];
-                    dummy[0] = this_block [31:24];
-                    // for (i = 0; i < 5; i += 1)
-                    //     @(posedge clk)
-                    end
-                    */
-                    // read_from_mem;
-                    /*write_en_out = 0;*/
-                    // for (i = 0; i < 4; i += 1)
-                    //      @(posedge clk)
-                    /*block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};*/
-
-                    // @(posedge clk)
-                    /*
-                    read_data = block[line_num];
-                    dirty[line_num] = 0;
-                    */
-                end
-        end 
-        tag[line_num] = tag_num;
-    end else begin
-        if(write_en_in == 1) begin
-            block[line_num] = read_data_2;
-            dirty[line_num] = 1;
-            valid_bit[line_num] = 1;
-            tag[line_num] = tag_num;
-            cache_done = 1;
-        end else begin
-            for (i = 0; i < 6; i += 1) begin
-                states[i] = 0;
-            end
-            states[5] = 1;
-            cache_done = 0;
-
-            /*write_en_out = 0;*/
-            // for (i = 0; i < 4; i += 1)
-            //      @(posedge clk)
-            /*block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};*/
-
-            // @(posedge clk)
-            // read_data = this_block;
-            /*
-            read_data = block[line_num];
-            */
-        end
-    end
 end
 
 // function read_from_mem (input a);
