@@ -29,6 +29,7 @@ module regfile(
     assign rt_data = data[rt_num];
 
     always_ff @(posedge clk, negedge rst_b) begin
+        $display("$3=%x", data[3]);
         if (rst_b == 0) begin
             int i;
             for (i = 0; i < size; i++)

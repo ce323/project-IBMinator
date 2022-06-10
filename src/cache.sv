@@ -8,7 +8,7 @@
 // blocks * 1 * 
 
 
-module cache #(
+module cache1 #(
     parameter BLOCKS = 2048,
     parameter SIZE = 8 * 1024 //bytes
 ) (
@@ -20,7 +20,6 @@ module cache #(
     mem_data_out, // output of memory to cache
     write_en_in, // input signal of write or read to cache
     write_en_out, // output signal to memory
-    hit,
     clk,
     cache_done,
     reset
@@ -35,7 +34,6 @@ output  [31:0] address_output;
 input write_en_in;
 output reg write_en_out;
 input clk, reset;
-output reg hit;
 output reg cache_done;
 
 
@@ -136,7 +134,6 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    hit = 0;
     i = 0;
     line_num = address_input[12:2];                  // get and store the block number from input address
     tag_num = address_input[31:13];                  // get and store the tag from input address
@@ -149,7 +146,6 @@ always @(posedge clk) begin
             if (this_tag == tag_num) begin
                 block[line_num] = read_data_2;
                 dirty[line_num] = 1;
-                hit = 1;
                 cache_done = 1;
             end else begin
                 for (i = 0; i < 6; i += 1) begin
@@ -181,7 +177,6 @@ always @(posedge clk) begin
         end else begin
                 if(this_tag == tag_num) begin
                     read_data = block[line_num];
-                    hit = 1;
                     cache_done = 1;
                 end else begin
                     for (i = 0; i < 6; i += 1) begin
