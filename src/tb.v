@@ -6,7 +6,10 @@
 // Tag : [31:13] address - Block [12:2] address 
 // dirty = 1 bit , valid = 1 bit
 // blocks * 1 * 
+<<<<<<< HEAD
 // `timescale 1ns/1ns
+=======
+>>>>>>> 8387fba9dbf68db6989a13d81f986f01e207ca42
 
 module cache2 #(
     parameter BLOCKS = 2048,
@@ -25,6 +28,12 @@ module cache2 #(
     reset
 );
 
+<<<<<<< HEAD
+=======
+parameter BLOCKS = 2048;
+parameter SIZE = 8 * 1024; //bytes
+
+>>>>>>> 8387fba9dbf68db6989a13d81f986f01e207ca42
 input [31:0] read_data_2;
 output reg [31:0] read_data;
 input   [7:0]  mem_data_out [0:3];
@@ -215,8 +224,13 @@ always @(posedge clk) begin
     dirty_bit = dirty[line_num];
 
     if (states[0]) begin
+<<<<<<< HEAD
         // address_output = address_input;
         // old_address_input = address_input;
+=======
+        address_output = address_input;
+        old_address_input = address_input;
+>>>>>>> 8387fba9dbf68db6989a13d81f986f01e207ca42
         block[line_num] = read_data_2;
         dirty[line_num] = 1;
         cache_done = 1;
@@ -247,8 +261,13 @@ always @(posedge clk) begin
     end
 
     else if (states[2]) begin
+<<<<<<< HEAD
         // address_output = address_input;
         // old_address_input = address_input;
+=======
+        address_output = address_input;
+        old_address_input = address_input;
+>>>>>>> 8387fba9dbf68db6989a13d81f986f01e207ca42
         read_data = block[line_num];
         write_en_out = 0;
         cache_done = 1;
