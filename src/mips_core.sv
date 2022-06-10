@@ -62,7 +62,6 @@ cache cache(
     .mem_data_out(mem_data_out),                  // input of memory to cache
     .write_en_in(write_signal),                   // input signal of write or read to cache
     .write_en_out(mem_write_en),                  // output signal to main memory to write or read
-    .hit(hit),
     .clk(clk), 
     .cache_done(cache_done),
     .reset(rst_b)
@@ -157,7 +156,6 @@ wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
 pc pc(
-    .hit(hit),
     .clk(clk),
     .rst_b(rst_b),
     .pc_input(pc_input),

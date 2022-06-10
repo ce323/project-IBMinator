@@ -1,5 +1,5 @@
 module pc (
-    input clk, rst_b,hit, cache_done,
+    input clk, rst_b, cache_done,
     input [31:0] pc_input,
     output reg [31:0] pc_output
 );
