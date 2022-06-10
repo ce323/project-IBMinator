@@ -6,7 +6,6 @@
 // Tag : [31:13] address - Block [12:2] address 
 // dirty = 1 bit , valid = 1 bit
 // blocks * 1 * 
-`timescale 1ns/1ns
 
 module cache (
     address_input, // address that goes into cache generated from alu
@@ -22,8 +21,8 @@ module cache (
     reset
 );
 
-parameter BLOCKS = 2048,
-parameter SIZE = 8 * 1024 //bytes
+parameter BLOCKS = 2048;
+parameter SIZE = 8 * 1024; //bytes
 
 input [31:0] read_data_2;
 output reg [31:0] read_data;
@@ -76,7 +75,7 @@ reg dirty_bit;
 always @(posedge clk) begin
     dirty_bit = dirty[line_num];
 
-    if (state[0]) begin
+    if (states[0]) begin
         address_output = address_input;
         old_address_input = address_input;
         block[line_num] = read_data_2;
@@ -108,7 +107,7 @@ always @(posedge clk) begin
         j = -1;
     end
 
-    else if (state[2]) begin
+    else if (states[2]) begin
         address_output = address_input;
         old_address_input = address_input;
         read_data = block[line_num];
@@ -140,12 +139,12 @@ always @(posedge clk) begin
         j = -1;
     end
 
-    else if (state[4] && j == 0) begin
+    else if (states[4] && j == 0) begin
         address_output = address_input;
         write_en_out = 0;
-    end else if (state[4] && j == 4)
+    end else if (states[4] && j == 4)
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-    else if (state[4] && j == 5) begin
+    else if (states[4] && j == 5) begin
         block[line_num] = read_data_2;
         tag[line_num] = tag_num;
         dirty[line_num] = 1;
