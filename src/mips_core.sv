@@ -166,8 +166,8 @@ pc pc(
 
 
 
-always_latch @(rst_b or halted_wire) begin
-    if(rst_b == 0) 
+always_latch @(rst_b, halted_wire) begin
+    if(rst_b == 0)
         halted = 0;
 
     if(halted_wire == 1)

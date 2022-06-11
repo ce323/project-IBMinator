@@ -36,9 +36,7 @@ output reg write_en_out;
 input reg clk, reset;
 output reg cache_done;
 
-reg [31:0] old_address_input;
-
-assign address_output = address_input;
+// assign address_output = address_input;
 reg [31:0] block [BLOCKS]; // our cache system consisting of a dirty bit, a valid bit, a tag and a data array
 reg [18:0] tag   [BLOCKS];
 reg valid_bit    [BLOCKS];
@@ -118,8 +116,6 @@ always @(posedge clk) begin
     dirty_bit = dirty[line_num];
 
     if (states[0]) begin
-        // address_output = address_input;
-        // old_address_input = address_input;
         block[line_num] = read_data_2;
         dirty[line_num] = 1;
         cache_done = 1;
@@ -127,21 +123,23 @@ always @(posedge clk) begin
     end
 
     else if (states[1] && j == 0 && dirty_bit) begin
-        // address_output = old_address_input;
+        address_output = {this_tag, line_num, 2'b0};
         this_block = block[line_num];
         write_en_out = 1;
         dummy[3] = this_block [7:0];
         dummy[2] = this_block [15:8];
         dummy[1] = this_block [23:16];
         dummy[0] = this_block [31:24];
-    end else if (states[1] && (dirty_bit && j == 1 || !dirty_bit && j == 0))
+    end else if (states[1] && !dirty_bit && j == 0) begin
+        address_output = address_input;
         write_en_out = 0;
-    else if (states[1] && (dirty_bit && j == 5 || !dirty_bit && j == 4)) begin
-        // address_output = address_input;
-        // old_address_input = address_input;
-    end else if (states[1] && (dirty_bit && j == 9 || !dirty_bit && j == 8))
+    end else if (states[1] && dirty_bit && j == 1)
+        write_en_out = 0;
+    else if (states[1] && dirty_bit && j == 5)
+        address_output = address_input;
+    else if (states[1] && (dirty_bit && j == 9 || !dirty_bit && j == 4))
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-    else if (states[1] && (dirty_bit && j == 10 || !dirty_bit && j == 9)) begin
+    else if (states[1] && (dirty_bit && j == 10 || !dirty_bit && j == 5)) begin
         block[line_num] = read_data_2;
         dirty[line_num] = 1;
         tag[line_num] = tag_num;
@@ -150,30 +148,33 @@ always @(posedge clk) begin
     end
 
     else if (states[2]) begin
-        // address_output = address_input;
-        // old_address_input = address_input;
+        address_output = address_input;
         read_data = block[line_num];
         write_en_out = 0;
+        dirty[line_num] = 0;
         cache_done = 1;
         j = -1;
     end
 
     else if (states[3] && j == 0 && dirty_bit) begin
-        // address_output = old_address_input;
+        address_output = {this_tag, line_num, 2'b0};
         this_block = block[line_num];
         write_en_out = 1;
         dummy[3] = this_block [7:0];
         dummy[2] = this_block [15:8];
         dummy[1] = this_block [23:16];
         dummy[0] = this_block [31:24];
-    end else if (states[3] && (dirty_bit && j == 1 || !dirty_bit && j == 0))
+    end else if (states[3] && !dirty_bit && j == 0) begin
+        address_output = address_input;
         write_en_out = 0;
-    else if (states[3] && (dirty_bit && j == 5 || !dirty_bit && j == 4)) begin
-        // address_output = address_input;
-        // old_address_input = address_input;
-    end else if (states[3] && (dirty_bit && j == 9 || !dirty_bit && j == 8))
+    end else if (states[3] && dirty_bit && j == 1)
+        write_en_out = 0;
+    else if (states[3] && dirty_bit && j == 5)
+        address_output = address_input;
+    else if (states[3] && (dirty_bit && j == 10 || !dirty_bit && j == 5)) begin
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-    else if (states[3] && (dirty_bit && j == 10 || !dirty_bit && j == 9)) begin
+        // $display("aaa=%x", block[line_num]);
+    end else if (states[3] && (dirty_bit && j == 10 || !dirty_bit && j == 5)) begin
         read_data = block[line_num];
         tag[line_num] = tag_num;
         dirty[line_num] = 0;
@@ -182,7 +183,7 @@ always @(posedge clk) begin
     end
 
     else if (states[4] && j == 0) begin
-        // address_output = address_input;
+        address_output = address_input;
         write_en_out = 0;
     end else if (states[4] && j == 4)
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
@@ -196,13 +197,14 @@ always @(posedge clk) begin
     end
 
     else if (states[5] && j == 0) begin
-    //   address_output = address_input;
+      address_output = address_input;
       write_en_out = 0;
     end else if (states[5] && j == 4)
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
     else if (states[5] && j == 5) begin
         read_data = block[line_num];
         tag[line_num] = tag_num;
+        dirty[line_num] = 0;
         valid_bit[line_num] = 1;
         cache_done = 1;
         j = -1;
