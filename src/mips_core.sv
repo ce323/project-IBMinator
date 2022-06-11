@@ -113,7 +113,8 @@ alu alu(
     .funcw(alu_op),
     .clk(clk),
     .rst_b(rst_b),
-    .inst(inst)
+    .inst(inst),
+    .cache_done(cache_done)
 );
 
 /*

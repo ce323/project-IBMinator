@@ -1,4 +1,4 @@
-module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst);
+module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, cache_done);
 	output reg zero;
 	input[31:0] input1w , input2w ;
 	reg [4:0] sh_amountw;
@@ -10,6 +10,7 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst);
 	reg[31:0] input1 , input2;
 	reg signed [31:0] hold1 , hold2;
 	input [31:0] inst;
+	input cache_done;
     
 	`define xorr 6'b100110
  	`define sll 6'b000000
@@ -36,7 +37,8 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst);
 	
 
 	always_latch @(*) begin
-		zero = 0;
+		if (cache_done) begin
+			zero = 0;
 
 		input1 = input1w;
 		input2 =  input2w ;
@@ -116,7 +118,7 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst);
 			begin
 			end
 	endcase
-
-end
+		end
+	end
 
 endmodule
