@@ -171,9 +171,9 @@ always @(posedge clk) begin
         write_en_out = 0;
     else if (states[3] && dirty_bit && j == 5)
         address_output = address_input;
-    else if (states[3] && (dirty_bit && j == 10 || !dirty_bit && j == 5)) begin
+    else if (states[3] && (dirty_bit && j == 9 || !dirty_bit && j == 4)) begin
         block[line_num] = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-        // $display("aaa=%x", block[line_num]);
+        $display("aaa=%x", block[line_num]);
     end else if (states[3] && (dirty_bit && j == 10 || !dirty_bit && j == 5)) begin
         read_data = block[line_num];
         tag[line_num] = tag_num;

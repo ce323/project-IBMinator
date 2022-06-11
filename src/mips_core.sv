@@ -68,7 +68,7 @@ cache2 cache(
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data = mem_to_reg ? read_data : mem_addr;
+wire [31:0] rd_data = mem_to_reg ? read_data : cache_adr_input;
 
 
 regfile regfile(
