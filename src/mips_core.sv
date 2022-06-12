@@ -35,43 +35,37 @@ rst_b           -->        reset                   : input   1
 */
 
 // controll outputs
-wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write;
+wire reg_dst, jump, branch, mem_read, mem_to_reg, alu_src, reg_write, is_mem_inst, is_word;
 
 wire [31:0] read_data_1;
 wire [31:0] read_data_2;
-// assign mem_data_in[3] = read_data_2 [7:0];
-// assign mem_data_in[2] = read_data_2 [15:8];
-// assign mem_data_in[1] = read_data_2 [23:16];
-// assign mem_data_in[0] = read_data_2 [31:24];
-
-wire [31:0] read_data;// = {mem_data_out[0], mem_data_out[1], mem_data_out[2], mem_data_out[3]};
-
-
-// mem data out ==> cache ==> read data
-// 
+wire [31:0] read_data;
 
 wire hit, cache_done, write_signal;
 wire [31:0] cache_adr_input;
 
-cache2 cache(
+
+cache cache (
     .address_input(cache_adr_input),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
-    .read_data_2(read_data_2),                     // input data of cache 
-    .read_data(read_data),                        // output of cache
+    .cache_input(read_data_2),                    // input data of cache 
+    .cache_data_out(read_data),                // output of cache
     .mem_data_in(mem_data_in),                    // output of cache to memory
     .mem_data_out(mem_data_out),                  // input of memory to cache
     .write_en_in(write_signal),                   // input signal of write or read to cache
     .write_en_out(mem_write_en),                  // output signal to main memory to write or read
+    .is_word(is_word),
     .clk(clk), 
     .cache_done(cache_done),
-    .reset(rst_b)
+    .reset(rst_b),
+    .is_mem_inst(is_mem_inst)
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
 wire [31:0] rd_data = mem_to_reg ? read_data : cache_adr_input;
 
 
-regfile regfile(
+regfile regfile (
     .rs_data(read_data_1),
     .rt_data(read_data_2),
     .rs_num(inst[25:21]),
@@ -105,7 +99,7 @@ wire [31:0] sign_extend_out = {{16{inst[15]}}, inst[15:0]};
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
-alu alu(
+alu alu (
     .input1w(read_data_1),
     .input2w(input_2_alu),
     .zero(zero),
@@ -129,7 +123,7 @@ clk             -->        clk                     : input   1
 
 wire halted_wire;
 
-controll controll(
+controll controll (
     .inst(inst[31:26]),
     .func(inst[5:0]),
     .reg_dst(reg_dst),
@@ -140,6 +134,8 @@ controll controll(
     .mem_write_en(write_signal),
     .alu_src(alu_src),
     .reg_write(reg_write),
+    .is_mem_inst(is_mem_inst),
+    .is_word(is_word),
     .clk(clk),
     .halted(halted_wire)
 );
@@ -149,8 +145,6 @@ wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
 
-
-// mux1 is the mux after "Add" (ALU result)
 wire and_out;
 and(and_out, zero, branch);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;

@@ -11,13 +11,15 @@ module controll (
 	mem_to_reg,
 	alu_op,
 	alu_src,
-	reg_write, 
+	reg_write,
+	is_mem_inst,
+	is_word,
 	halted
 );
 
 
 input clk, inst;
-output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, halted;
+output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, is_mem_inst, is_word, halted;
 
 wire [5:0] inst;
 input  [5:0] func;
@@ -60,6 +62,8 @@ always_latch @(inst) begin
 				assign mem_write_en = 0;
 				assign jump = 0;
 				assign branch = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 				if (func == `ANDI_8) 
 					assign halted = 1;
 				else
@@ -81,9 +85,9 @@ always_latch @(inst) begin
 				assign jump = 1;
 				assign branch = 0;
 				assign halted = 0;
-
 				assign alu_op = `ADD_16;
-
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 			end
 
 		//J-Type (2): JAL
@@ -97,6 +101,8 @@ always_latch @(inst) begin
 				assign jump = 1;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
 			end
@@ -114,6 +120,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -131,6 +139,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `ADDU_12;
 
@@ -149,7 +159,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
-
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 				assign alu_op = `AND_15;
 
 			end	
@@ -165,7 +176,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
-
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 				assign alu_op = `XOR_1;
 
 			end	
@@ -181,6 +193,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `OR_10;
 
@@ -197,7 +211,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 1;
 				assign halted = 0;
-
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `I_Type_6_BEQ;
 
@@ -214,6 +229,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 1;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `I_Type_7_BNE;
 
@@ -231,6 +248,8 @@ always_latch @(inst) begin
 				assign branch = 1;
 				assign alu_op = `I_Type_8_BLEZ;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 			end	
 //***********************************//
@@ -245,6 +264,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 1;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `I_Type_9_BGTZ;
 
@@ -261,6 +282,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 1;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `I_Type_10_BGEZ;
 
@@ -279,6 +302,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 1;
 
 				assign alu_op = `ADD_16;
 
@@ -297,6 +322,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 1;
 
 				assign alu_op = `ADD_16;
 
@@ -313,6 +340,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -329,6 +358,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
 
@@ -345,6 +376,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `SLT_7;
 
@@ -361,6 +394,8 @@ always_latch @(inst) begin
 				assign jump = 0;
 				assign branch = 0;
 				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
 
 				assign alu_op = `I_Type_16_LUI;
 
@@ -373,7 +408,7 @@ always_latch @(inst) begin
 
 
 
-endcase
+	endcase
 
 end
 endmodule

@@ -37,8 +37,7 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, cache_done
 	
 
 	always_latch @(*) begin
-		if (cache_done) begin
-			zero = 0;
+		zero = 0;
 
 		input1 = input1w;
 		input2 =  input2w ;
@@ -52,73 +51,71 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, cache_done
 		hold2 = input2;
 
 		case (func)
-		`xorr :
-			out = input1 ^ input2;
- 		`sll :
-			out = input2 << sh_amount;
- 		`sllv :
-			out = input2 << input1;
- 		`srl :
-			out = input2 >> sh_amount;
- 		`sub :
-			out = hold1 - hold2;
- 		`srlv:
-			out = input2 >> input1;
- 		`slt :
-			if(hold1 < hold2)
-                out = 1;
-            else
-				out=0;
-		`subu :
-			out = input1 - input2;
- 		`orr :
-			out = input1 | {16'b0, input2[15:0]};
- 		`norr :
-			out = ~(input1 | input2);
-		`add:
-			out = $signed(input1) + $signed(input2);
- 		`addiu :
-			out = input1 + {16'b0, input2[15:0]};
-		`mult :
-			out = hold1 * hold2;
-  		`div :
-			out = hold1 / hold2;
-  		`andd :
-			out = input1 & input2;
- 		`sra :
-			out = $signed(input2) >>> sh_amount;
-		`I_Type_6_BEQ: begin
-			if(input1 == input2)
-				zero = 1;
-			else
-				zero = 0;
+			`xorr :
+				out = input1 ^ input2;
+ 			`sll :
+				out = input2 << sh_amount;
+ 			`sllv :
+				out = input2 << input1;
+ 			`srl :
+				out = input2 >> sh_amount;
+ 			`sub :
+				out = hold1 - hold2;
+ 			`srlv:
+				out = input2 >> input1;
+ 			`slt :
+				if(hold1 < hold2)
+        	        out = 1;
+        	    else
+					out=0;
+			`subu :
+				out = input1 - input2;
+ 			`orr :
+				out = input1 | {16'b0, input2[15:0]};
+ 			`norr :
+				out = ~(input1 | input2);
+			`add:
+				out = $signed(input1) + $signed(input2);
+ 			`addiu :
+				out = input1 + {16'b0, input2[15:0]};
+			`mult :
+				out = hold1 * hold2;
+  			`div :
+				out = hold1 / hold2;
+  			`andd :
+				out = input1 & input2;
+ 			`sra :
+				out = $signed(input2) >>> sh_amount;
+			`I_Type_6_BEQ: begin
+				if(input1 == input2)
+					zero = 1;
+				else
+					zero = 0;
+				end
+			`I_Type_7_BNE: begin
+				if(input1 != input2)
+					zero = 1;
+				else
+					zero = 0;
 			end
-		`I_Type_7_BNE: begin
-			if(input1 != input2)
-				zero = 1;
-			else
-				zero = 0;
-		end
-		`I_Type_8_BLEZ: begin
-			if(input1 <= 0)
-				zero = 1;
-		end
-		`I_Type_9_BGTZ: begin
-			if(input1>0)
-				zero = 1;
-		end
-		`I_Type_10_BGEZ: begin
-			if($signed(input1)>=0)
-				zero = 1;
-		end
-		`I_Type_16_LUI:
-			out = {input2[15:0], 16'b0};
-
-		default:
-			begin
+			`I_Type_8_BLEZ: begin
+				if(input1 <= 0)
+					zero = 1;
 			end
-	endcase
-		end
+			`I_Type_9_BGTZ: begin
+				if(input1>0)
+					zero = 1;
+			end
+			`I_Type_10_BGEZ: begin
+				if($signed(input1)>=0)
+					zero = 1;
+			end
+			`I_Type_16_LUI:
+				out = {input2[15:0], 16'b0};
+			default:
+				begin
+				end
+		endcase
 	end
 
 endmodule

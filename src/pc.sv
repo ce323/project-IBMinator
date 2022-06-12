@@ -4,10 +4,10 @@ module pc (
     output reg [31:0] pc_output
 );
 
-always @(posedge clk, negedge rst_b/*, posedge cache_done*/) begin
+always @(posedge clk, negedge rst_b) begin
     if(rst_b == 0)
         pc_output <= 0;
-    else if (cache_done)
+    else if (!cache_done)
         pc_output <= pc_input;
 end
 

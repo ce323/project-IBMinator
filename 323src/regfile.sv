@@ -37,7 +37,6 @@ module regfile(
             if (rd_we && (rd_num != 0))
                 data[rd_num] <= rd_data;
         end
-        // $display("$9=%x", data[9]);
     end
 
 	always @(halted) begin
