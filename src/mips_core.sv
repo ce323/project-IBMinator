@@ -59,7 +59,7 @@ wire [4:0] instruction_15_to_11_copy;
 
 
 ID id(clk, reg_dst, jump, branch, write_signal, mem_to_reg,
- alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op,
+ alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op, // this has a problem ::: PC_plus_4_output
  inst_out, mem_data_out, mem_data_in, sign_extend_out, inst_out[20:16], inst_out[15:11],
  reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
  reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy,  alu_op_copy,
@@ -67,25 +67,24 @@ ID id(clk, reg_dst, jump, branch, write_signal, mem_to_reg,
  instruction_20_to_16_copy, instruction_15_to_11_copy);
 
 MEM mem();
-EX ex();
 
 EX ex(
     .clk(clk),
-	.mem_write_en(mem_write_en),
-	.mem_to_reg(mem_to_reg),
-	.reg_write(reg_write),
-    .zero(zero),
-    .alu_result(alu_result),
-    .read_data_2(read_data_2),
+	.mem_write_en(write_signal_copy),
+	.mem_to_reg(mem_to_reg_copy), 
+	.reg_write(reg_write_copy),
+    .alu_result(cache_adr_input),
+    .read_data_2(read_data_2_copy),
     .rd_num(rd_num),
 	.mem_write_en_out(mem_write_en_out),
 	.mem_to_reg_out(mem_to_reg_out),
 	.reg_write_out(reg_write_out),
-    .zero_out(zero_out),
     .alu_result_out(alu_result_out),
     .read_data_2_out(read_data_2_out),
     .rd_num_out(rd_num_out),
-)
+);
+
+IF fetch(.PC_plus_4_input(PC_plus_4),.PC_plus_4_output(PC_plus_4_output),.inst_in(inst),.inst_out(inst_out),.clk(clk));
 
 
 
@@ -96,7 +95,7 @@ cache cache (
     .cache_data_out(read_data),                // output of cache
     .mem_data_in(mem_data_in),                    // output of cache to memory
     .mem_data_out(mem_data_out),                  // input of memory to cache
-    .write_en_in(write_signal),                   // input signal of write or read to cache
+    .write_en_in(mem_write_en_out),                   // input signal of write or read to cache
     .write_en_out(mem_write_en),                  // output signal to main memory to write or read
     .is_word(is_word),
     .clk(clk), 
@@ -140,7 +139,7 @@ halted          -->        halted                  : input   1
 
 wire zero;
 wire [31:0] sign_extend_out = {{16{inst_out[15]}}, inst_out[15:0]};
-wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
+wire [31:0] input_2_alu = alu_src ? sign_extend_out_copy : read_data_2;
 wire [5:0] alu_op;
 
 alu alu (
@@ -148,7 +147,7 @@ alu alu (
     .input2w(input_2_alu),
     .zero(zero),
     .out(cache_adr_input), // goes in cache 
-    .funcw(alu_op),
+    .funcw(alu_op_copy),
     .clk(clk),
     .rst_b(rst_b),
     .inst(inst),
@@ -187,14 +186,14 @@ controll controll (
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] PC_plus_4_output;
-wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
+wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out_copy << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
 wire [31:0] inst_out;
-IF fetch(.PC_plus_4_input(PC_plus_4),.PC_plus_4_output(PC_plus_4_output),.inst_in(inst),.inst_out(inst_out),.clk(clk));
+
 
 
 wire and_out;
-and(and_out, zero, branch);
+and(and_out, zero, branch_copy);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
