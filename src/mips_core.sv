@@ -45,10 +45,54 @@ wire hit, cache_done, write_signal;
 wire [31:0] cache_adr_input;
 
 
+
+//wires for ID module
+wire [5:0] alu_op_copy;        
+wire reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
+    reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy;
+wire [31:0] pc_copy;
+wire [31:0] read_data_1_copy;
+wire [31:0] read_data_2_copy;
+wire [31:0] sign_extend_out_copy;
+wire [4:0] instruction_20_to_16_copy;
+wire [4:0] instruction_15_to_11_copy;
+
+
+ID id(clk, reg_dst, jump, branch, write_signal, mem_to_reg,
+ alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op,
+ inst_out, mem_data_out, mem_data_in, sign_extend_out, inst_out[20:16], inst_out[15:11],
+ reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
+ reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy,  alu_op_copy,
+ pc_copy, read_data_1_copy, read_data_2_copy, sign_extend_out_copy,
+ instruction_20_to_16_copy, instruction_15_to_11_copy);
+
+MEM mem();
+EX ex();
+
+EX ex(
+    .clk(clk),
+	.mem_write_en(mem_write_en),
+	.mem_to_reg(mem_to_reg),
+	.reg_write(reg_write),
+    .zero(zero),
+    .alu_result(alu_result),
+    .read_data_2(read_data_2),
+    .rd_num(rd_num),
+	.mem_write_en_out(mem_write_en_out),
+	.mem_to_reg_out(mem_to_reg_out),
+	.reg_write_out(reg_write_out),
+    .zero_out(zero_out),
+    .alu_result_out(alu_result_out),
+    .read_data_2_out(read_data_2_out),
+    .rd_num_out(rd_num_out),
+)
+
+
+
 cache cache (
     .address_input(cache_adr_input),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
-    .cache_input(read_data_2),                    // input data of cache 
+    .cache_input(read_data_2_out),                    // input data of cache 
     .cache_data_out(read_data),                // output of cache
     .mem_data_in(mem_data_in),                    // output of cache to memory
     .mem_data_out(mem_data_out),                  // input of memory to cache
@@ -68,8 +112,8 @@ wire [31:0] rd_data = mem_to_reg ? read_data : cache_adr_input;
 regfile regfile (
     .rs_data(read_data_1),
     .rt_data(read_data_2),
-    .rs_num(inst[25:21]),
-    .rt_num(inst[20:16]),
+    .rs_num(inst_out[25:21]),
+    .rt_num(inst_out[20:16]),
     .rd_num(rd_num),
     .rd_data(rd_data),
     .rd_we(reg_write),
@@ -95,7 +139,7 @@ halted          -->        halted                  : input   1
 
 
 wire zero;
-wire [31:0] sign_extend_out = {{16{inst[15]}}, inst[15:0]};
+wire [31:0] sign_extend_out = {{16{inst_out[15]}}, inst_out[15:0]};
 wire [31:0] input_2_alu = alu_src ? sign_extend_out : read_data_2;
 wire [5:0] alu_op;
 
@@ -124,8 +168,8 @@ clk             -->        clk                     : input   1
 wire halted_wire;
 
 controll controll (
-    .inst(inst[31:26]),
-    .func(inst[5:0]),
+    .inst(inst_out[31:26]),
+    .func(inst_out[5:0]),
     .reg_dst(reg_dst),
     .jump(jump),
     .branch(branch),
@@ -142,8 +186,12 @@ controll controll (
 
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
+wire [31:0] PC_plus_4_output;
 wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
+wire [31:0] inst_out;
+IF fetch(.PC_plus_4_input(PC_plus_4),.PC_plus_4_output(PC_plus_4_output),.inst_in(inst),.inst_out(inst_out),.clk(clk));
+
 
 wire and_out;
 and(and_out, zero, branch);
