@@ -1,4 +1,4 @@
-module MEM(
+module MEM (
     clk,
 	mem_write_en,
 	alu_result,
