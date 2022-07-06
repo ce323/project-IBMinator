@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Wed Jul  6 13:58:19 2022
+# Make data base, printed on Wed Jul  6 14:31:33 2022
 
 # Variables
 
@@ -44,7 +44,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-d832ef80-adaf-4d23-a917-ea7672b77d71.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/vscode-ipc-69f52c07-4d2b-4d1c-a807-07e9f4a56f22.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -166,10 +166,10 @@ INPUT = test/default/addiu
 
 # Directories
 
-# . (device 16777220, inode 79966232): 14 files, no impossibilities.
-# test/default (device 16777220, inode 79966345): 27 files, no impossibilities.
-# 323src (device 16777220, inode 79966321): 7 files, no impossibilities.
-# src (device 16777220, inode 79966331): 13 files, no impossibilities.
+# . (device 16777220, inode 79971131): 14 files, no impossibilities.
+# test/default (device 16777220, inode 79971255): 27 files, no impossibilities.
+# 323src (device 16777220, inode 79971231): 7 files, no impossibilities.
+# src (device 16777220, inode 79971241): 13 files, no impossibilities.
 
 # 61 files, no impossibilities in 4 directories.
 
@@ -280,7 +280,7 @@ test/default/addiu.mem:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-06 13:58:11
+#  Last modified 2022-07-06 14:31:07
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -452,6 +452,6 @@ src/pc.sv:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Jul  6 13:58:19 2022
+# Finished Make data base on Wed Jul  6 14:31:33 2022
 
  
