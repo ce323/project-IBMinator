@@ -1,5 +1,6 @@
 module ID(
     clk,
+
     //control inputs
     reg_dst,
     jump,
@@ -69,7 +70,7 @@ input [31:0] sign_extend_out_copy;
 input [4:0] instruction_20_to_16_copy;
 input [4:0] instruction_15_to_11_copy;
 
-always@(posedge clk) begin
+always @(posedge clk) begin
     //control assignments
     reg_dst_copy <= reg_dst;
     jump_copy <= jump;
@@ -82,6 +83,7 @@ always@(posedge clk) begin
     is_word_copy <= is_word;
     halted_wire_copy <= halted_wire;
     alu_op_copy <= alu_op;
+    
     //other aasignments
     pc_copy <= pc;
     read_data_1_copy <= read_data_1;

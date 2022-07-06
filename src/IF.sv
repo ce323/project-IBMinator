@@ -1,8 +1,8 @@
-module IF(
-    input[31:0] PC_plus_4_input,
+module IF (
+    input [31:0] PC_plus_4_input,
     output reg [31:0] PC_plus_4_output,
-    input[31:0] inst_in,
-    output reg[31:0] inst_out,
+    input [31:0] inst_in,
+    output reg [31:0] inst_out,
     input clk
 );
 
