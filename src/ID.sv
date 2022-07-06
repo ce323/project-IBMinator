@@ -15,6 +15,7 @@ module ID(
     alu_op, 
     
     //other inputs
+    PC_plus_4,
     pc,
     read_data_1,
     read_data_2,
@@ -36,6 +37,7 @@ module ID(
     alu_op_copy,
 
     //other outputs
+    PC_plus_4_copy,
     pc_copy,
     read_data_1_copy,
     read_data_2_copy,
@@ -55,7 +57,7 @@ output reg reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_c
     reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy;
 
 //other inputs
-input [31:0] pc;
+input [31:0] pc,PC_plus_4;
 input [31:0] read_data_1;
 input [31:0] read_data_2;
 input [31:0] sign_extend_out;
@@ -63,12 +65,12 @@ input [4:0] instruction_20_to_16;
 input [4:0] instruction_15_to_11;
 
 //other outputs
-input [31:0] pc_copy;
-input [31:0] read_data_1_copy;
-input [31:0] read_data_2_copy;
-input [31:0] sign_extend_out_copy;
-input [4:0] instruction_20_to_16_copy;
-input [4:0] instruction_15_to_11_copy;
+output reg [31:0] pc_copy,PC_plus_4_copy;
+output reg [31:0] read_data_1_copy;
+output reg [31:0] read_data_2_copy;
+output reg [31:0] sign_extend_out_copy;
+output reg [4:0] instruction_20_to_16_copy;
+output reg [4:0] instruction_15_to_11_copy;
 
 always @(posedge clk) begin
     //control assignments
@@ -85,6 +87,9 @@ always @(posedge clk) begin
     alu_op_copy <= alu_op;
     
     //other aasignments
+    PC_plus_4_copy <= PC_plus_4;
+    instruction_5_to_0_copy <= instruction_5_to_0;
+
     pc_copy <= pc;
     read_data_1_copy <= read_data_1;
     read_data_2_copy <= read_data_2;

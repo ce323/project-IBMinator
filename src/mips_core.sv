@@ -47,49 +47,105 @@ wire [31:0] cache_adr_input;
 
 
 //wires for ID module
-wire [5:0] alu_op_copy;        
-wire reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
-    reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy;
-wire [31:0] pc_copy;
-wire [31:0] read_data_1_copy;
-wire [31:0] read_data_2_copy;
-wire [31:0] sign_extend_out_copy;
-wire [4:0] instruction_20_to_16_copy;
-wire [4:0] instruction_15_to_11_copy;
+wire [5:0] alu_op_id_out;        
+wire reg_dst_id_out, jump_id_out, branch_id_out, write_signal_id_out, mem_to_reg_id_out, alu_src_id_out, 
+    reg_write_id_out, is_mem_inst_id_out, is_word_id_out, halted_wire_id_out;
+wire [31:0] inst_out;
+wire [31:0] read_data_1_id_out;
+wire [31:0] read_data_2_id_out;
+wire [31:0] sign_extend_out_id_out;
+wire [4:0] instruction_20_to_16_id_out;
+wire [4:0] instruction_15_to_11_id_out;
 
 
-ID id(clk, reg_dst, jump, branch, write_signal, mem_to_reg,
- alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op, // this has a problem ::: PC_plus_4_output
- inst_out, mem_data_out, mem_data_in, sign_extend_out, inst_out[20:16], inst_out[15:11],
- reg_dst_copy, jump_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
- reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy,  alu_op_copy,
- pc_copy, read_data_1_copy, read_data_2_copy, sign_extend_out_copy,
- instruction_20_to_16_copy, instruction_15_to_11_copy);
-
-MEM mem();
-
-EX ex(
+ID id (
     .clk(clk),
-	.mem_write_en(write_signal_copy),
-	.mem_to_reg(mem_to_reg_copy), 
-	.reg_write(reg_write_copy),
-    .alu_result(cache_adr_input),
-    .read_data_2(read_data_2_copy),
-    .rd_num(rd_num),
-	.mem_write_en_out(mem_write_en_out),
-	.mem_to_reg_out(mem_to_reg_out),
-	.reg_write_out(reg_write_out),
-    .alu_result_out(alu_result_out),
-    .read_data_2_out(read_data_2_out),
-    .rd_num_out(rd_num_out),
+
+    .reg_dst(reg_dst),
+    .jump(jump),
+    .branch(branch),
+    .write_signal(write_signal),
+    .mem_to_reg(mem_to_reg),
+    .alu_src(alu_src),
+    .reg_write(reg_write),
+    .is_mem_inst(is_mem_inst),
+    .is_word(is_word),
+    .halted_wire(halted_wire),
+    .alu_op(alu_op),
+
+    .PC_plus_4(PC_plus_4),
+    .pc(inst_out),
+    .read_data_1(mem_data_out),
+    .read_data_2(mem_data_in),
+    .sign_extend_out(sign_extend_out),
+    .instruction_20_to_16(inst_out[20:16]),
+    .instruction_15_to_11(inst_out[15:11]),
+
+    .reg_dst_copy(reg_dst_id_out),
+    .jump_copy(jump_id_out),
+    .branch_copy(branch_id_out),
+    .write_signal_copy(write_signal_id_out),
+    .mem_to_reg_cop(mem_to_reg_id_out),
+    .alu_src_copy(alu_src_id_out), 
+    .reg_write_copy(reg_write_id_out),
+    .is_mem_inst_copy(is_mem_inst_id_out),
+    .is_word_copy(is_word_id_out),
+    .halted_wire_copy(halted_wire_id_out),
+    .alu_op_copy(alu_op_id_out),
+
+    .PC_plus_4_copy(PC_plus_4_id_out),
+    .pc_copy(inst_out_id_out),
+    .read_data_1_copy(read_data_1_id_out),
+    .read_data_2_copy(read_data_2_id_out),
+    .sign_extend_out_copy(sign_extend_out_id_out),
+    .instruction_20_to_16_copy(instruction_20_to_16_id_out),
+    .instruction_15_to_11_copy(instruction_15_to_11_id_out)
 );
 
-IF fetch(.PC_plus_4_input(PC_plus_4),.PC_plus_4_output(PC_plus_4_output),.inst_in(inst),.inst_out(inst_out),.clk(clk));
+wire alu_result_mem_out, mem_to_reg_mem_out, read_data_mem_out, rd_num_mem_out, reg_write_mem_out;
+MEM mem (
+    .clk(clk),
 
+    .alu_result(alu_result_ex_out),
+    .mem_to_reg(mem_to_reg_ex_out),
+	.read_data(read_data),
+	.rd_num(rd_num_ex_out),
+	.reg_write(reg_write_ex_out),
+.
+	.alu_result_out(alu_result_mem_out),
+	.mem_to_reg_out(mem_to_reg_mem_out),
+	.read_data_out(read_data_mem_out),
+	.rd_num_out(rd_num_mem_out),
+	.reg_write_out(reg_write_mem_out)
+);
 
+wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, alu_result_ex_out, read_data_2_ex_out, rd_num_ex_out;
+EX ex (
+    .clk(clk),
+	.mem_write_en(write_signal_id_out),
+	.mem_to_reg(mem_to_reg_id_out), 
+	.reg_write(reg_write_id_out),
+    .alu_result(cache_adr_input),
+    .read_data_2(read_data_2_id_out),
+    .rd_num(rd_num),
+    
+	.mem_write_en_out(mem_write_en_ex_out),
+	.mem_to_reg_out(mem_to_reg_ex_out),
+	.reg_write_out(reg_write_ex_out),
+    .alu_result_out(alu_result_ex_out),
+    .read_data_2_out(read_data_2_ex_out),
+    .rd_num_out(rd_num_ex_out)
+);
+
+IF fetch (
+    .PC_plus_4_input(PC_plus_4),
+    .PC_plus_4_output(PC_plus_4_output),
+    .inst_in(inst),.inst_out(inst_out),
+    .clk(clk)
+);
 
 cache cache (
-    .address_input(cache_adr_input),              // address that goes into cache generated from alu
+    .address_input(alu_result_ex_out),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
     .cache_input(read_data_2_out),                    // input data of cache 
     .cache_data_out(read_data),                // output of cache
@@ -105,7 +161,7 @@ cache cache (
 );
 
 wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
-wire [31:0] rd_data = mem_to_reg ? read_data : cache_adr_input;
+wire [31:0] rd_data = mem_to_reg_mem_out ? read_data_mem_out : alu_result_mem_out;
 
 
 regfile regfile (
@@ -115,7 +171,7 @@ regfile regfile (
     .rt_num(inst_out[20:16]),
     .rd_num(rd_num),
     .rd_data(rd_data),
-    .rd_we(reg_write),
+    .rd_we(reg_write_mem_out),
     .clk(clk),
     .rst_b(rst_b),
     .halted(halted)
@@ -139,7 +195,7 @@ halted          -->        halted                  : input   1
 
 wire zero;
 wire [31:0] sign_extend_out = {{16{inst_out[15]}}, inst_out[15:0]};
-wire [31:0] input_2_alu = alu_src ? sign_extend_out_copy : read_data_2;
+wire [31:0] input_2_alu = alu_src ? sign_extend_out_id_out : read_data_2;
 wire [5:0] alu_op;
 
 alu alu (
@@ -147,7 +203,7 @@ alu alu (
     .input2w(input_2_alu),
     .zero(zero),
     .out(cache_adr_input), // goes in cache 
-    .funcw(alu_op_copy),
+    .funcw(alu_op_id_out),
     .clk(clk),
     .rst_b(rst_b),
     .inst(inst),
@@ -186,14 +242,14 @@ controll controll (
 
 wire [31:0] PC_plus_4 = inst_addr + 4;
 wire [31:0] PC_plus_4_output;
-wire [31:0] adder2_out = PC_plus_4 + (sign_extend_out_copy << 2);
+wire [31:0] adder2_out = PC_plus_4_id_out + (sign_extend_out_id_out << 2);
 wire [31:0] jump_address = {PC_plus_4[31:28], inst[25:0], 2'b0};
 wire [31:0] inst_out;
 
 
 
 wire and_out;
-and(and_out, zero, branch_copy);
+and(and_out, zero, branch_id_out);
 wire [31:0] mux1_out = and_out ? adder2_out : PC_plus_4;
 wire [31:0] pc_input = jump ? jump_address : mux1_out;
 
