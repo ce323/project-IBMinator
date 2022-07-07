@@ -28,7 +28,7 @@ always @(posedge clk) begin
 	zero_out <= zero;
 	rd_num_out <= rd_num;
 	alu_result <= alu_result_out;
-	read_data_2 <= read_data_2_out
+	read_data_2 <= read_data_2_out;
 end
 
 

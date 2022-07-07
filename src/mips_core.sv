@@ -111,7 +111,7 @@ MEM mem (
 	.read_data(read_data),
 	.rd_num(rd_num_ex_out),
 	.reg_write(reg_write_ex_out),
-.
+
 	.alu_result_out(alu_result_mem_out),
 	.mem_to_reg_out(mem_to_reg_mem_out),
 	.read_data_out(read_data_mem_out),
