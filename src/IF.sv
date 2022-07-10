@@ -8,6 +8,10 @@ module IF (
 
 
 always @(posedge clk) begin
+    $display("##################################################################");
+    $display("IF");
+    $display("PC_plus_4_input: %b inst_in: %b", PC_plus_4_input, inst_in);
+
     PC_plus_4_output <= PC_plus_4_input;
     inst_out <= inst_in;
 end
