@@ -70,8 +70,8 @@ output reg [4:0] instruction_20_to_16_copy, instruction_15_to_11_copy;
 always @(posedge clk) begin
     $display("##################################################################");
     $display("ID");
-    $display("reg_dst: %b branch: %b write_signal: %b mem_to_reg: %b alu_src: %b reg_write: %b is_mem_inst: %b is_word: %b halted_wire: %b alu_op: %b PC_plus_4: %b read_data_1: %b read_data_2: %b sign_extend_out: %b instruction_20_to_16: %b instruction_15_to_11: %b", 
-        reg_dst, branch, write_signal, mem_to_reg, alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op, PC_plus_4, read_data_1, read_data_2, sign_extend_out, instruction_20_to_16, instruction_15_to_11);
+    $display("reg_dst: %b branch: %b write_signal: %b mem_to_reg: %b alu_src: %b reg_write: %b is_mem_inst: %b is_word: %b halted_wire: %b alu_op: %b PC_plus_4: %b read_data_1: %b read_data_2: %b sign_extend_out: %b instruction_20_to_16: %b instruction_15_to_11: %b is_mem_inst: %b is_word: %b", 
+        reg_dst, branch, write_signal, mem_to_reg, alu_src, reg_write, is_mem_inst, is_word, halted_wire, alu_op, PC_plus_4, read_data_1, read_data_2, sign_extend_out, instruction_20_to_16, instruction_15_to_11,is_mem_inst,is_word);
 
     //control assignments
     reg_dst_copy <= reg_dst;

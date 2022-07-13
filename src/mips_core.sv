@@ -104,15 +104,17 @@ MEM mem (
 	.read_data(read_data),
 	.rd_num(rd_num_ex_out),
 	.reg_write(reg_write_ex_out),
+    .halted(halted_ex_out),
 
 	.alu_result_out(alu_result_mem_out),
 	.mem_to_reg_out(mem_to_reg_mem_out),
 	.read_data_out(read_data_mem_out),
 	.rd_num_out(rd_num_mem_out),
-	.reg_write_out(reg_write_mem_out)
+	.reg_write_out(reg_write_mem_out),
+    .halted_out(halted_mem_out)
 );
 
-wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out;
+wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out,halted_ex_out,halted_mem_out;
 
 wire [7:0] read_data_2_ex_out [3:0];
 EX ex (
@@ -125,6 +127,7 @@ EX ex (
     .rd_num(rd_num),
     .is_mem_inst(is_mem_inst_id_out),
     .is_word(is_word_id_out),
+    .halted(halted_wire_id_out),
     
 	.mem_write_en_out(mem_write_en_ex_out),
 	.mem_to_reg_out(mem_to_reg_ex_out),
@@ -133,7 +136,8 @@ EX ex (
     .read_data_2_out(read_data_2_ex_out),
     .rd_num_out(rd_num_ex_out),
     .is_mem_inst_out(is_mem_inst_ex_out),
-    .is_word_out(is_word_ex_out)
+    .is_word_out(is_word_ex_out),
+    .halted_out(halted_ex_out)
 );
 
 wire [31:0] PC_plus_4_if_output, inst_if_out;
@@ -198,11 +202,12 @@ halted          -->        halted                  : input   1
 
 wire zero;
 wire [31:0] sign_extend_out = {{16{inst_if_out[15]}}, inst_if_out[15:0]};
-wire [31:0] input_2_alu = alu_src_id_out ? sign_extend_out_id_out : read_data_2;
+wire [31:0] input_2_alu = alu_src_id_out ? sign_extend_out_id_out : read_data_2_id_out;
 wire [5:0] alu_op;
+wire [31:0] read_data_1_id_out_whole = {{read_data_1_id_out[0]},{read_data_1_id_out[1]},{read_data_1_id_out[2]},{read_data_1_id_out[3]}};
 
 alu alu (
-    .input1w(read_data_1),
+    .input1w(read_data_1_id_out_whole),
     .input2w(input_2_alu),
     .zero(zero),
     .out(cache_adr_input), // goes in cache 
@@ -263,11 +268,11 @@ pc pc(
 
 
 
-always_latch @(rst_b, halted_wire) begin
+always_latch @(rst_b, halted_mem_out) begin
     if(rst_b == 0)
         halted = 0;
 
-    if(halted_wire == 1)
+    if(halted_mem_out == 1)
         halted = 1;
 end
 

@@ -6,21 +6,23 @@ module MEM (
 	read_data,
 	rd_num,
 	reg_write,
+	halted,
 
 	alu_result_out,
 	mem_to_reg_out,
 	read_data_out,
 	rd_num_out,
-	reg_write_out
+	reg_write_out,
+	halted_out
 );
 
 
 
-input clk, mem_to_reg, reg_write;
+input clk, mem_to_reg, reg_write, halted;
 input [31:0] alu_result, read_data;
 input [4:0] rd_num;
 
-output reg mem_to_reg_out, reg_write_out;
+output reg mem_to_reg_out, reg_write_out, halted_out;
 output reg [31:0] alu_result_out, read_data_out;
 output reg [4:0] rd_num_out;
 
@@ -34,6 +36,7 @@ always @(posedge clk) begin
 	alu_result_out <= alu_result;
 	read_data_out <= read_data;
 	rd_num_out <= rd_num;
+	halted_out <= halted;
 end
 
 endmodule
