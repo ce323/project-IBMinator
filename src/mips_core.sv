@@ -163,7 +163,7 @@ cache cache (
     .is_mem_inst(is_mem_inst_ex_out)
 );
 
-wire [4:0] rd_num = reg_dst ? inst[15:11] : inst[20:16];
+wire [4:0] rd_num = reg_dst_id_out ? inst[15:11] : inst[20:16];
 wire [31:0] rd_data = mem_to_reg_mem_out ? read_data_mem_out : alu_result_mem_out;
 
 
@@ -198,7 +198,7 @@ halted          -->        halted                  : input   1
 
 wire zero;
 wire [31:0] sign_extend_out = {{16{inst_if_out[15]}}, inst_if_out[15:0]};
-wire [31:0] input_2_alu = alu_src ? sign_extend_out_id_out : read_data_2;
+wire [31:0] input_2_alu = alu_src_id_out ? sign_extend_out_id_out : read_data_2;
 wire [5:0] alu_op;
 
 alu alu (
