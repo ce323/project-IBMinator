@@ -34,8 +34,10 @@ module regfile(
             for (i = 0; i < size; i++)
                 data[i] <= 0;
         end else begin
-            if (rd_we && (rd_num != 0))
+            if (rd_we && (rd_num != 0)) begin
                 data[rd_num] <= rd_data;
+                $display(rd_data);
+            end
         end
     end
 

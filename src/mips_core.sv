@@ -47,8 +47,8 @@ wire [31:0] cache_adr_input;
 wire [5:0] alu_op_id_out;        
 wire reg_dst_id_out, branch_id_out, write_signal_id_out, mem_to_reg_id_out, alu_src_id_out, 
     reg_write_id_out, is_mem_inst_id_out, is_word_id_out, halted_wire_id_out;
-wire [7:0] read_data_1_id_out [3:0];
-wire [7:0] read_data_2_id_out [3:0];
+wire [31:0] read_data_1_id_out;
+wire [31:0] read_data_2_id_out ;
 wire [31:0] sign_extend_out_id_out, PC_plus_4_id_out, alu_result_ex_out,alu_result_mem_out,read_data_mem_out;
 wire [4:0] instruction_20_to_16_id_out, instruction_15_to_11_id_out,rd_num_ex_out, rd_num_mem_out;
 
@@ -69,8 +69,8 @@ ID id (
 
     .PC_plus_4(PC_plus_4_if_output),
     // .pc(inst_if_out),
-    .read_data_1(mem_data_out),  // 4 * 8
-    .read_data_2(mem_data_in),
+    .read_data_1(read_data_1),  // 4 * 8
+    .read_data_2(read_data_2),
     .sign_extend_out(sign_extend_out),
     .instruction_20_to_16(inst_if_out[20:16]),
     .instruction_15_to_11(inst_if_out[15:11]),
@@ -114,9 +114,9 @@ MEM mem (
     .halted_out(halted_mem_out)
 );
 
-wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out,halted_ex_out,halted_mem_out;
+wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out, halted_ex_out, halted_mem_out;
 
-wire [7:0] read_data_2_ex_out [3:0];
+wire [31:0] read_data_2_ex_out;
 EX ex (
     .clk(clk),
 	.mem_write_en(write_signal_id_out),
@@ -150,11 +150,10 @@ IF fetch (
     .clk(clk)
 );
 
-wire [31:0] read_data_2_cache = {read_data_2_ex_out[3],read_data_2_ex_out[2],read_data_2_ex_out[1],read_data_2_ex_out[3]};
 cache cache (
     .address_input(alu_result_ex_out),              // address that goes into cache generated from alu
     .address_output(mem_addr),                    // address that cache gives to memory
-    .cache_input(read_data_2_cache),                    // input data of cache 
+    .cache_input(read_data_2_ex_out),                    // input data of cache 
     .cache_data_out(read_data),                // output of cache
     .mem_data_in(mem_data_in),                    // output of cache to memory
     .mem_data_out(mem_data_out),                  // input of memory to cache
@@ -167,7 +166,7 @@ cache cache (
     .is_mem_inst(is_mem_inst_ex_out)
 );
 
-wire [4:0] rd_num = reg_dst_id_out ? inst[15:11] : inst[20:16];
+wire [4:0] rd_num = reg_dst_id_out ? instruction_15_to_11_id_out : instruction_20_to_16_id_out;
 wire [31:0] rd_data = mem_to_reg_mem_out ? read_data_mem_out : alu_result_mem_out;
 
 
@@ -176,7 +175,7 @@ regfile regfile (
     .rt_data(read_data_2),
     .rs_num(inst_if_out[25:21]),
     .rt_num(inst_if_out[20:16]),
-    .rd_num(rd_num),
+    .rd_num(rd_num_mem_out),
     .rd_data(rd_data),
     .rd_we(reg_write_mem_out),
     .clk(clk),
@@ -204,10 +203,9 @@ wire zero;
 wire [31:0] sign_extend_out = {{16{inst_if_out[15]}}, inst_if_out[15:0]};
 wire [31:0] input_2_alu = alu_src_id_out ? sign_extend_out_id_out : read_data_2_id_out;
 wire [5:0] alu_op;
-wire [31:0] read_data_1_id_out_whole = {{read_data_1_id_out[0]},{read_data_1_id_out[1]},{read_data_1_id_out[2]},{read_data_1_id_out[3]}};
 
 alu alu (
-    .input1w(read_data_1_id_out_whole),
+    .input1w(read_data_1_id_out),
     .input2w(input_2_alu),
     .zero(zero),
     .out(cache_adr_input), // goes in cache 
@@ -265,6 +263,12 @@ pc pc(
     .cache_done(cache_done),
     .pc_output(inst_addr)
 );
+
+
+always @(posedge clk) begin
+    $display("read_data2: %x, read_data2_id_out: %x, read_data2_ex_out: %x, read_data1: %x, read_data1_id_out: %x",read_data_2
+    ,read_data_2_id_out,read_data_2_ex_out,read_data_1,read_data_1_id_out);
+end
 
 
 
