@@ -54,6 +54,7 @@ wire [4:0] instruction_20_to_16_id_out, instruction_15_to_11_id_out,rd_num_ex_ou
 
 
 ID id (
+    .cache_done(cache_done),
     .clk(clk),
 
     .reg_dst(reg_dst),
@@ -97,6 +98,7 @@ ID id (
 
 wire mem_to_reg_mem_out, reg_write_mem_out;
 MEM mem (
+    .cache_done(cache_done),
     .clk(clk),
 
     .alu_result(alu_result_ex_out),
@@ -118,6 +120,7 @@ wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_ou
 
 wire [31:0] read_data_2_ex_out;
 EX ex (
+    .cache_done(cache_done),
     .clk(clk),
 	.mem_write_en(write_signal_id_out),
 	.mem_to_reg(mem_to_reg_id_out), 
@@ -143,6 +146,7 @@ EX ex (
 wire [31:0] PC_plus_4_if_output, inst_if_out;
 
 IF fetch (
+    .cache_done(cache_done),
     .PC_plus_4_input(PC_plus_4),
     .PC_plus_4_output(PC_plus_4_if_output),
     .inst_in(inst),
@@ -265,10 +269,10 @@ pc pc(
 );
 
 
-always @(posedge clk) begin
-    $display("read_data2: %x, read_data2_id_out: %x, read_data2_ex_out: %x, read_data1: %x, read_data1_id_out: %x",read_data_2
-    ,read_data_2_id_out,read_data_2_ex_out,read_data_1,read_data_1_id_out);
-end
+// always @(posedge clk) begin
+//     $display("read_data2: %x, read_data2_id_out: %x, read_data2_ex_out: %x, read_data1: %x, read_data1_id_out: %x",read_data_2
+//     ,read_data_2_id_out,read_data_2_ex_out,read_data_1,read_data_1_id_out);
+// end
 
 
 

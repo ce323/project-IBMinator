@@ -1,4 +1,5 @@
 module EX (
+	cache_done,
 	clk,
 	mem_write_en,
 	mem_to_reg,
@@ -21,7 +22,7 @@ module EX (
 	halted_out
 );
 
-input clk, mem_write_en, mem_to_reg, reg_write, is_mem_inst, is_word,halted;
+input cache_done,clk, mem_write_en, mem_to_reg, reg_write, is_mem_inst, is_word,halted;
 output [4:0] rd_num;
 input [31:0]alu_result;
 input [31:0] read_data_2;
@@ -31,6 +32,7 @@ output reg [31:0] alu_result_out;
 output reg [31:0] read_data_2_out;
 
 always @(posedge clk) begin
+	if(!cache_done) begin
 	// $display("##################################################################");
 	// $display("EX");
 	// $display("mem_write_en:%b, mem_to_reg:%b, reg_write:%b rd_num:%b, alu_result:%b, read_data_2:%b is_mem_inst: %b is_word: %b",mem_write_en,mem_to_reg,reg_write,rd_num,alu_result,read_data_2,is_mem_inst,is_word);
@@ -44,6 +46,7 @@ always @(posedge clk) begin
 	is_mem_inst_out <= is_mem_inst;
 	is_word_out <= is_word;
 	halted_out <= halted;
+	end
 end
 
 
