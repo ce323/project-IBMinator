@@ -36,7 +36,6 @@ module regfile(
         end else begin
             if (rd_we && (rd_num != 0)) begin
                 data[rd_num] <= rd_data;
-                $display(rd_data);
             end
         end
     end

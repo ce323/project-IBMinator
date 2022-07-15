@@ -49,14 +49,14 @@ wire reg_dst_id_out, branch_id_out, write_signal_id_out, mem_to_reg_id_out, alu_
     reg_write_id_out, is_mem_inst_id_out, is_word_id_out, halted_wire_id_out;
 wire [31:0] read_data_1_id_out;
 wire [31:0] read_data_2_id_out ;
-wire [31:0] sign_extend_out_id_out, PC_plus_4_id_out, alu_result_ex_out,alu_result_mem_out,read_data_mem_out;
+wire [31:0] sign_extend_out_id_out, PC_plus_4_id_out, alu_result_ex_out,alu_result_mem_out,read_data_mem_out,inst_id_out;
 wire [4:0] instruction_20_to_16_id_out, instruction_15_to_11_id_out,rd_num_ex_out, rd_num_mem_out;
 
 
 ID id (
     .cache_done(cache_done),
     .clk(clk),
-
+    .inst(inst_if_out),
     .reg_dst(reg_dst),
     .branch(branch),
     .write_signal(write_signal),
@@ -75,6 +75,7 @@ ID id (
     .sign_extend_out(sign_extend_out),
     .instruction_20_to_16(inst_if_out[20:16]),
     .instruction_15_to_11(inst_if_out[15:11]),
+    .inst_out(inst_id_out),
 
     .reg_dst_copy(reg_dst_id_out),
     .branch_copy(branch_id_out),
@@ -116,7 +117,7 @@ MEM mem (
     .halted_out(halted_mem_out)
 );
 
-wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out, halted_ex_out, halted_mem_out;
+wire mem_write_en_ex_out, mem_to_reg_ex_out, reg_write_ex_out, is_mem_inst_ex_out, is_word_ex_out, halted_ex_out, halted_mem_out,jmp_freeze;
 
 wire [31:0] read_data_2_ex_out;
 EX ex (
@@ -151,7 +152,8 @@ IF fetch (
     .PC_plus_4_output(PC_plus_4_if_output),
     .inst_in(inst),
     .inst_out(inst_if_out),
-    .clk(clk)
+    .clk(clk),
+    .jmp_freeze(jmp_freeze)
 );
 
 cache cache (
@@ -216,7 +218,7 @@ alu alu (
     .funcw(alu_op_id_out),
     .clk(clk),
     .rst_b(rst_b),
-    .inst(inst),
+    .inst(inst_id_out),
     .cache_done(cache_done)
 );
 
@@ -265,14 +267,9 @@ pc pc(
     .rst_b(rst_b),
     .pc_input(pc_input),
     .cache_done(cache_done),
-    .pc_output(inst_addr)
+    .pc_output(inst_addr),
+    .jmp_freeze(jmp_freeze)
 );
-
-
-// always @(posedge clk) begin
-//     $display("read_data2: %x, read_data2_id_out: %x, read_data2_ex_out: %x, read_data1: %x, read_data1_id_out: %x",read_data_2
-//     ,read_data_2_id_out,read_data_2_ex_out,read_data_1,read_data_1_id_out);
-// end
 
 
 
