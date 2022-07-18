@@ -32,7 +32,10 @@ module coprocessor(
     // sw  111000
 
 
-    
+    //todo: sw and lw and connections (signals: input - output of this module)
+    //tested and was correct: add - sub - mul - div - rev
+    //not tested: cmp
+    //in progress: rnd
     always@(posedge clk) begin
     
 
