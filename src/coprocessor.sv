@@ -8,9 +8,12 @@ module coprocessor(
     integer i;
     reg [31:0] registers [31:0];
     reg [31:0] t [0:5];
-    reg [22:0] mantisa [2:0];
+    reg [23:0] mantisa [2:0];
+    reg [23:0] mul_ans,div_ans;
+    reg [47:0] extra;
     reg [7:0] exponent [2:0];
     reg sign [2:0];
+    reg div_by_zero,lower,higher,equal;
     // 000111 01010 101010100 => pipeline??
     // adds $ts0,$t1,$t2
     
@@ -29,10 +32,30 @@ module coprocessor(
     // sw  111000
 
 
-    // add and subtract
+    
     always@(posedge clk) begin
+    
 
-    if (opcode[5:1] == 6'b11000) begin
+    //lw (load word)
+    if (opcode == 6'b110111) begin
+        // mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
+        // mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
+        // exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
+        // exponent[1] = register[addr_reg_in2][30:23];
+    end
+
+    //sw (store word)
+    else if (opcode == 6'b111000) begin
+        // mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
+        // mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
+        // exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
+        // exponent[1] = register[addr_reg_in2][30:23];
+    end    
+
+
+
+    // add and subtract
+    else if (opcode[5:1] == 5'b11000) begin
     mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
     mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
     exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
@@ -102,10 +125,139 @@ module coprocessor(
         end
     end
 
-
-    end else if(opcode)
+    // multiply
+    end else if(opcode == 6'b110010) begin
+    mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
+    mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
+    exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
+    exponent[1] = register[addr_reg_in2][30:23];
     
+    if (register[addr_reg_in1] == 0 || register[addr_reg_in2] == 0)
+        register[addr_destination] = 0;
+    else begin
+        mul_ans = 0;
+        register[addr_destination][30:23] = exponent[0] + exponent[1] - 127 + 1;
+        register[addr_destination][31] = register[addr_reg_in1][31] ^ register[addr_reg_in2][31];
+        mul_ans = mantisa[0] * mantisa[1];
+        for (i = 0;i < 23 && mul_ans[47] != 1 ; i = i+1 ) begin
+            mul_ans = mul_ans << 1;
+            register[addr_destination][30:23] = register[addr_destination][30:23] - 1;
+        end
     end
+    register[addr_destination][22:0] = mul_ans[46:24];
+    end
+
+    
+    else if(opcode == 6'b110011) begin
+    div_by_zero = 0;
+
+    mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
+    mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
+    exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
+    exponent[1] = register[addr_reg_in2][30:23];
+    if (register[addr_reg_in2] == 0)
+        div_by_zero = 1;
+    else if(register[addr_reg_in1] == 0)
+        register[addr_destination] = 0;
+    else begin
+        register[addr_destination][31] = register[addr_reg_in1][31] ^ register[addr_reg_in2][31];
+        
+        extra = {mantisa[0],24'b0};
+        extra = extra / mantisa[1];
+        
+        if(extra[24] == 1)
+            extra = extra >> 1;
+        else
+            exponent[0] = exponent[0] - 1;
+        div_ans = extra[23:0];
+        register[addr_destination][30:23] = exponent[0] - exponent[1] + 127;
+
+        for (i = 0; i<23 && div_ans[23] != 1 ; i = i + 1 ) begin
+            div_ans = div_ans << 1;
+        end
+        register[addr_destination][22:0] = div_ans[22:0];
+    end
+
+    // divide
+    end else if(opcode == 6'b110100) begin
+        mantisa[0] = {1'b1,register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
+        mantisa[1] = {1'b1,register[addr_reg_in2][22:0]};
+        exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
+        exponent[1] = register[addr_reg_in2][30:23];
+        sign[0] = register[addr_reg_in1][31];
+        sign[1] = register[addr_reg_in2][31];
+        lower = 0;
+        higher = 0;
+        equal = 0;
+        if(!sign[0] && !sign[1]) begin
+        if(exponent[0] > exponent[1])
+            higher = 1;
+        else if(exponent[0]<exponent[1])
+            lower = 1;
+        else begin
+            if(mantisa[0] > mantisa[1])
+                higher = 1;
+            else if(mantisa[0]<mantisa[1])
+                lower = 1;
+            else 
+                equal = 1; 
+        end
+        end
+        else if(!sign[0] && sign[1])
+            higher = 1;
+        else if(sign[0] && !sign[1])
+            lower  = 1;
+        else begin
+            if(exponent[0] < exponent[1])
+            higher = 1;
+        else if(exponent[0]>exponent[1])
+            lower = 1;
+        else begin
+            if(mantisa[0] < mantisa[1])
+                higher = 1;
+            else if(mantisa[0]>mantisa[1])
+                lower = 1;
+            else 
+                equal = 1; 
+        end
+        end
+    end
+
+
+    //reverse
+    else if (opcode == 6'b110101) begin
+    div_by_zero = 0;
+    
+    mantisa[0] = {1'b1,23'b00000000000000000000000};
+    mantisa[1] = {1'b1,register[addr_reg_in1][22:0]};
+    exponent[0] = 8'b01111111;
+    exponent[1] = register[addr_reg_in1][30:23];
+    if (register[addr_reg_in1] == 0)
+        div_by_zero = 1;
+    else begin
+        register[addr_destination][31] = register[addr_reg_in1][31];
+        
+        extra = {mantisa[0],24'b0};
+        extra = extra / mantisa[1];
+        
+        if(extra[24] == 1)
+            extra = extra >> 1;
+        else
+            exponent[0] = exponent[0] - 1;
+        div_ans = extra[23:0];
+        register[addr_destination][30:23] = exponent[0] - exponent[1] + 127;
+
+        for (i = 0; i<23 && div_ans[23] != 1 ; i = i + 1 ) begin
+            div_ans = div_ans << 1;
+        end
+        register[addr_destination][22:0] = div_ans[22:0];
+    end
+    end
+
+    else if(opcode = 6'b 110110) begin
+        
+    end
+end
 
 
 endmodule

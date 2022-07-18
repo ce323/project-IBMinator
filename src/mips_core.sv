@@ -42,6 +42,21 @@ wire [31:0] read_data_1, read_data_2, read_data;
 wire hit, cache_done, write_signal;
 wire [31:0] cache_adr_input;
 
+//instance of coprocessor
+//this part is used to connect main core and coprocessor
+wire [4:0] addr_reg_in1, addr_reg_in2, addr_destination; //input of module
+wire [5:0] opcode; //input of module
+wire [31:0] outdata_float; //output of module
+wire [31:0] inputdata_float; //input of module
+coprocessor coprocessor(
+    addr_reg_in1, addr_reg_in2, addr_destination,
+    opcode,
+    clk, 
+    outdata_float ,
+    inputdata_float   
+);
+
+
 
 //wires for ID module
 wire [5:0] alu_op_id_out;        
