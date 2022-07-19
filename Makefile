@@ -20,7 +20,7 @@ MEM = $(ASM:%.s=%.mem)
 
 assemble: $(MEM)
 
-INPUT ?= test/default/brtest2
+INPUT ?= test/default/addiu
 
 obj_dir/Vmips_machine: src/*.sv 323src/*.sv 323src/sim_main.cpp
 	docker run -ti -v ${PWD}:/work												\
@@ -33,7 +33,8 @@ compile: obj_dir/Vmips_machine
 
 sim: compile assemble
 	cp ${INPUT}.mem output/instructions.mem
-	./obj_dir/Vmips_machine
+	docker run --entrypoint=/work/obj_dir/Vmips_machine -ti -v ${PWD}:/work \
+        verilator/verilator:latest
 
 verify: sim
 	diff -u ${INPUT}.reg output/regdump.reg 1>&2

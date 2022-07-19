@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Sun Jul 10 20:04:46 2022
+
+# Make data base, printed on Tue Jul 19 01:46:24 2022
 
 # Variables
 
@@ -44,17 +47,17 @@ VSCODE_CWD = /
 # environment
 PATH = /Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/local/bin:/opt/local/sbin:/Users/AMF/opt/anaconda3/bin:/Users/AMF/opt/anaconda3/condabin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/share/dotnet:/opt/X11/bin:~/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 # environment
-LaunchInstanceID = 0D65E59C-822C-4B62-8775-32837FE73ED9
+LaunchInstanceID = 1B165477-4ED3-4EE1-AE94-4E90C5A10EDC
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.FwRvucRHp4/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.odLpqcnzd4/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
-DISPLAY = /private/tmp/com.apple.launchd.IqyXC595Hl/org.xquartz:0
+DISPLAY = /private/tmp/com.apple.launchd.YQxHKC0dq3/org.xquartz:0
 # environment
 CONDA_EXE = /Users/AMF/opt/anaconda3/bin/conda
 # environment
@@ -70,7 +73,7 @@ MEM = $(ASM:%.s=%.mem)
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/92d25e35d9bf1a6b16f7d0758f25d48ace11e5b9
+VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/b06ae3b2d2dbfe28bca3134cc6be65935cdfea6a
 # environment
 LOGNAME = AMF
 # environment
@@ -112,7 +115,7 @@ TMPDIR = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.69.0-main.sock
+VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.69.1-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -122,7 +125,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.80306958.80306964
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.80817061.80817067
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -158,7 +161,7 @@ TEST_DIRS = $(wildcard test/**/)
 # environment
 CONDA_PREFIX = /Users/AMF/opt/anaconda3
 # environment
-VSCODE_PID = 540
+VSCODE_PID = 567
 # makefile (from `Makefile', line 23)
 INPUT = test/default/addiu
 # environment
@@ -288,7 +291,7 @@ test/default/addiu.mem:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-06 14:31:07
+#  Last modified 2022-07-19 01:45:55
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -297,9 +300,6 @@ Makefile:
 # Not a target:
 src/cache.sv:
 #  Implicit rule search has not been done.
- 
-make: *** No rule to make target `all'.  Stop.
-
 #  Modification time never checked.
 #  File has not been updated.
 
@@ -312,6 +312,7 @@ make: *** No rule to make target `all'.  Stop.
 # Not a target:
 src/MEM.sv:
 #  Implicit rule search has not been done.
+ 
 #  Modification time never checked.
 #  File has not been updated.
 
@@ -460,6 +461,6 @@ src/pc.sv:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Jul 10 20:04:46 2022
+# Finished Make data base on Tue Jul 19 01:46:24 2022
 
  
