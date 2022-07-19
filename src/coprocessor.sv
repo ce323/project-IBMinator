@@ -3,7 +3,8 @@ module coprocessor(
     input[5:0] opcode,
     input clk , 
     output [31:0] outdata_float ,
-    input [31:0] inputdata_float   
+    input [31:0] inputdata_float ,
+    input write_data_enable   
 );
 
     integer i;
@@ -46,7 +47,9 @@ module coprocessor(
     always @(posedge clk) begin
     
         //lw (load word)
-        if (opcode == 6'b110111)
+        //if (opcode == 6'b110111)
+        
+        if (write_data_enable == 1'b1)
             registers[addr_reg_in1] = inputdata_float;
 
         //sw (store word)
