@@ -30,7 +30,7 @@ module coprocessor(
     // div 110011 --> Done, Tested
     // cmp 110100 --> Done
     // rev 110101 --> Done, Tested
-    // rnd 110110 -->
+    // rnd 110110 --> Done, Tested
     // lw  110111 --> Done
     // sw  111000 --> Done
 
@@ -259,15 +259,14 @@ module coprocessor(
 
             power = exponent[0] - bias;
             if (0 <= power && power <= 22) begin
-                if (mantisa[0][power] == 1) begin
-                    if (sign[0])
-                        register[addr_destination][22:0] = mantisa[0] - {1'b1, {(22 - power){1'b0}}};
-                    else
-                        register[addr_destination][22:0] = mantisa[0] + {1'b1, {(22 - power){1'b0}}};
+                if (mantisa[0][22 - power] == 1) begin
+                    dummy = 1;
+                    dummy = dummy << (22 - power);
+                    register[addr_destination][22:0] = mantisa[0] + dummy;
                 end
 
-                for (i = power; i < 23; i = i + 1)
-                        mantisa[0][i] = 0;
+                for (i = 0; i <= 22 - power; i = i + 1)
+                        register[addr_destination][i] = 0;
             end else if (power < 0) begin
                 if (power == -1) begin
                     register[addr_destination][30:23] = bias; // to power equal to 0
