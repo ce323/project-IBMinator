@@ -48,7 +48,7 @@ wire [4:0] addr_reg_in1, addr_reg_in2, addr_destination; //input of module
 wire [5:0] opcode; //input of module
 wire [31:0] outdata_float; //output of module
 wire [31:0] inputdata_float; //input of module
-coprocessor coprocessor(
+coprocessor coprocessor (
     addr_reg_in1, addr_reg_in2, addr_destination,
     opcode,
     clk, 
