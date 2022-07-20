@@ -3,7 +3,7 @@ module test ();
 reg [31:0] register [31:0];
 reg [23:0] mantisa [2:0];
 reg [7:0] exponent [2:0]; // 1.011 * 2^2= 10.11 --- 
-reg [31:0] in1 = 32'b10111111100000000000000000000000, in2 = 32'b00111111000011100101011000000100;
+reg [31:0] in1 = 32'b 01000000110100000000000000000000, in2 = 32'b 01000000101100000000000000000000;
 reg [4:0] addr_reg_in1 = 0, addr_reg_in2 = 1, addr_destination = 2;
 reg [47:0] mul_ans;
 integer i;
@@ -31,6 +31,7 @@ initial begin
         end
     end
     register[addr_destination][22:0] = mul_ans[46:24];
+    $display("%b",register[addr_destination]);
 end
     
 endmodule

@@ -3,7 +3,7 @@ module test ();
 reg [31:0] register [31:0];
 reg [23:0] mantisa [2:0];
 reg [7:0] exponent [2:0]; // 1.011 * 2^2= 10.11 --- 
-reg [31:0] in1 = 32'b 10111110100000000000000000000000;
+reg [31:0] in1 = 32'b 01000000101100000000000000000000;
 reg [4:0] addr_reg_in1 = 0, addr_reg_in2 = 1, addr_destination = 2;
 reg [23:0] div_ans;
 reg [24:0] dummy;
