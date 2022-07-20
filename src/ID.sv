@@ -49,8 +49,15 @@ module ID(
     addr_reg_in1_id_out,
     addr_reg_in2_id_out,
     addr_destination_id_out,
-    coprocessor_opcode,
-    coprocessor_opcode_id_out
+    // coprocessor_opcode,
+    reg_write_coprocessor,
+    reg_write_coprocessor_out,
+
+    // coprocessor_opcode_id_out
+
+    //coprocessor inputs and outputs
+	sw_coprocessor,
+	sw_coprocessor_copy
 );
 
 //inputs
@@ -66,12 +73,15 @@ output reg [5:0] alu_op_copy;
 output reg reg_dst_copy, branch_copy, write_signal_copy, mem_to_reg_copy, alu_src_copy, 
     reg_write_copy, is_mem_inst_copy, is_word_copy, halted_wire_copy;
 
+input reg_write_coprocessor,sw_coprocessor;
+output reg reg_write_coprocessor_out,sw_coprocessor_copy;
+
 //other inputs
 input [31:0] read_data_1,inst;
 input [31:0] read_data_2;
 input [31:0] PC_plus_4, sign_extend_out;
 input [4:0] instruction_20_to_16, instruction_15_to_11;
-input [5:0] coprocessor_opcode;
+// input [5:0] coprocessor_opcode;
 
 
 //other outputs
@@ -80,7 +90,7 @@ output reg [31:0]read_data_2_copy;
 output reg [31:0] PC_plus_4_copy, sign_extend_out_copy;
 output reg [4:0] instruction_20_to_16_copy, instruction_15_to_11_copy;
 output reg [4:0] addr_reg_in1_id_out, addr_reg_in2_id_out , addr_destination_id_out;
-output reg [5:0] coprocessor_opcode_id_out;
+// output reg [5:0] coprocessor_opcode_id_out;
 
 always @(posedge clk) begin
     if(!cache_done) begin
@@ -95,7 +105,7 @@ always @(posedge clk) begin
     is_word_copy <= is_word;
     halted_wire_copy <= halted_wire;
     alu_op_copy <= alu_op;
-    
+    reg_write_coprocessor_out <= reg_write_coprocessor;
     //other aasignments
     PC_plus_4_copy <= PC_plus_4;
 
@@ -109,6 +119,9 @@ always @(posedge clk) begin
     addr_reg_in1_id_out <= addr_reg_in1;
     addr_reg_in2_id_out <= addr_reg_in2;
     addr_destination_id_out <= addr_destination;
+    //coproessor
+
+	sw_coprocessor_copy <= sw_coprocessor;
     end
 end
 

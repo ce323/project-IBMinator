@@ -14,7 +14,9 @@ module controll (
 	reg_write,
 	is_mem_inst,
 	is_word,
-	halted
+	halted,
+	reg_write_coprocessor,
+	sw_coprocessor
 );
 
 
@@ -24,6 +26,7 @@ output reg reg_dst, jump, branch, mem_write_en, mem_to_reg, alu_src, reg_write, 
 wire [5:0] inst;
 input  [5:0] func;
 output reg [5:0] alu_op;
+output reg reg_write_coprocessor, sw_coprocessor;
 
 `define XOR_1 6'b100110
 `define SLL_2 6'b000000
@@ -48,11 +51,155 @@ output reg [5:0] alu_op;
 `define I_Type_9_BGTZ 6'b111011
 `define I_Type_10_BGEZ 6'b111100
 `define I_Type_16_LUI 6'b111101
+// coprocessor opcodes
+`define add_coprocessor 6'b110000 //--> Done, Tested
+`define sub_coprocessor 6'b110001 //--> Done, Tested
+`define mul_coprocessor 6'b110010 //--> Done, Tested
+`define div_coprocessor 6'b110011 //--> Done, Tested
+`define cmp_coprocessor 6'b110100 //--> Done, Tested
+`define rev_coprocessor 6'b110101 //--> Done, Tested
+`define rnd_coprocessor 6'b110110 //--> Done, Tested
+`define lw_coprocessor  6'b110111 //--> Done
+`define sw_coprocessor_opcode  6'b001011 //--> Done
 
 
 
 always_latch @(inst) begin
 	case(inst)
+		`add_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
+				assign alu_op =`add_coprocessor; 	
+			end
+         
+		`sub_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
+				assign alu_op = `sub_coprocessor;
+			end
+		
+		`mul_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;	
+				assign alu_op =`mul_coprocessor;
+
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 0;
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
+			end
+		`div_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
+				assign alu_op =`div_coprocessor;
+
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 0;
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
+			end
+		`cmp_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;	
+				assign alu_op =`cmp_coprocessor;
+
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 0;
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
+			end
+		`rev_coprocessor:
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
+				assign alu_op =`rev_coprocessor;
+
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 0;
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
+			end
+		`rnd_coprocessor :
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0; 
+				assign alu_op =`rnd_coprocessor;
+
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 0;
+				assign mem_to_reg = 0;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 0;
+				assign is_word = 0;
+			end
+		`lw_coprocessor : 
+			begin
+				assign reg_write_coprocessor = 1;
+				assign sw_coprocessor = 0;
+				//assign alu_op =`lw_coprocessor;
+				assign alu_op = `ADD_16;
+				assign reg_write = 0;
+				assign reg_dst = 0;
+				assign alu_src = 1;
+				assign mem_to_reg = 1;
+				assign mem_write_en = 0;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 1;
+			end
+		`sw_coprocessor_opcode: 
+			begin
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 1;
+				assign alu_op =`sw_coprocessor_opcode;
+
+				assign reg_write = 0;
+				assign reg_dst = 1'bx;
+				assign alu_src = 1;
+				assign mem_to_reg = 1'bx;
+				assign mem_write_en = 1;
+				assign jump = 0;
+				assign branch = 0;
+				assign halted = 0;
+				assign is_mem_inst = 1;
+				assign is_word = 1;
+			end 
+
 		`SLL_2:
 			begin
 				assign reg_write = 1;
@@ -64,13 +211,24 @@ always_latch @(inst) begin
 				assign branch = 0;
 				assign is_mem_inst = 0;
 				assign is_word = 0;
-				if (func == `ANDI_8) 
+				if (func == `ANDI_8) begin
 					assign halted = 1;
+					assign reg_write = 0;
+					assign reg_dst = 0;
+					assign alu_src = 0;
+					assign mem_to_reg = 0;
+					assign mem_write_en = 0;
+					assign jump = 0;
+					assign branch = 0;
+					assign is_mem_inst = 0;
+					assign is_word = 0;
+				end
 				else
 					assign halted = 0;
 				
 				assign alu_op = func;
-
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 			end
 
 
@@ -88,6 +246,8 @@ always_latch @(inst) begin
 				assign alu_op = `ADD_16;
 				assign is_mem_inst = 0;
 				assign is_word = 0;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 			end
 
 		//J-Type (2): JAL
@@ -105,6 +265,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 			end
 
 		//I-Type instructions
@@ -124,6 +286,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 
 
@@ -143,6 +307,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `ADDU_12;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 
 				assign mem_to_reg = 0;
@@ -162,6 +328,8 @@ always_latch @(inst) begin
 				assign is_mem_inst = 0;
 				assign is_word = 0;
 				assign alu_op = `AND_15;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -179,6 +347,8 @@ always_latch @(inst) begin
 				assign is_mem_inst = 0;
 				assign is_word = 0;
 				assign alu_op = `XOR_1;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -197,6 +367,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `OR_10;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -215,6 +387,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `I_Type_6_BEQ;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -233,6 +407,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `I_Type_7_BNE;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -250,6 +426,8 @@ always_latch @(inst) begin
 				assign halted = 0;
 				assign is_mem_inst = 0;
 				assign is_word = 0;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -268,6 +446,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `I_Type_9_BGTZ;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -286,6 +466,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `I_Type_10_BGEZ;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 
 
@@ -307,6 +489,9 @@ always_latch @(inst) begin
 
 				assign alu_op = `ADD_16;
 
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
+
 
 
 			end
@@ -326,6 +511,8 @@ always_latch @(inst) begin
 				assign is_word = 1;
 
 				assign alu_op = `ADD_16;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -344,6 +531,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -362,6 +551,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `ADD_16;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -380,6 +571,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `SLT_7;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 			end	
 //***********************************//
@@ -398,6 +591,8 @@ always_latch @(inst) begin
 				assign is_word = 0;
 
 				assign alu_op = `I_Type_16_LUI;
+				assign reg_write_coprocessor = 0;
+				assign sw_coprocessor = 0;
 
 
 			end	
