@@ -26,7 +26,7 @@ integer power;
 reg [22:0] dummy;
 
 initial begin
-    // register[addr_reg_in1] = in1;
+    register[addr_reg_in1] = in1;
     // register[addr_reg_in1] = in2;
     // register[addr_reg_in1] = in3;
     // register[addr_reg_in1] = in4;

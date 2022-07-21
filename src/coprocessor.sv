@@ -1,79 +1,66 @@
 module coprocessor(
-    input [4:0] addr_reg_in1, addr_reg_in2, addr_destination,
+    input [4:0] addr_reg_in1, addr_reg_in2, addr_destination, write_address,
     input[5:0] opcode,
     input clk , 
-    output [31:0] outdata_float ,
+    output reg [31:0] outdata_float ,
     input [31:0] inputdata_float ,
-    input write_data_enable,
-    //output reg write_data_enable_out,
-    output reg ch   _coprocessor_data_to_memory
+    input write_data_enable,cache_done
 );
+    // register[0] is for error bits
+    // register[0][0] -> Division by zero
+    // register[0][1] -> QNaN (quiet not a number)
+    // register[0][2] -> SNaN (signaling not a number)
+    // register[0][3] -> Inexact
+    // register[0][4] -> Underflow
+    // register[0][5] -> Overflow
 
-    integer is;
-    reg [31:0] registers [31:0];
+    integer i;
+    reg [31:0] register [31:0];
     reg [31:0] t [0:5];
     reg [23:0] mantisa [2:0];
-    reg [23:0] mul_ans,div_ans;
+    reg [24:0] mantisa_sum,d1,d2;
+    reg [23:0] div_ans;
+    reg [47:0] mul_ans;
     reg [47:0] extra;
     reg [7:0] exponent [2:0];
     reg sign [2:0];
-    reg div_by_zero, lower, higher, equal;
+
+    // for cmp
+    // store greater number at register[31] and lower number at register[30]
+    reg lower, higher, equal;
     integer bias = 127;
 
     // for rnd
     integer power;
     reg [22:0] dummy;
-
-    // 000111 01010 101010100 => pipeline??
-    // adds $ts0,$t1,$t2
     
-    // lws $ts0,
-    // sws
-    
-    // opcodes
-    // add 110000 --> Done, Tested
-    // sub 110001 --> Done, Tested
-    // mul 110010 --> Done, Tested
-    // div 110011 --> Done, Tested
-    // cmp 110100 --> Done, Tested
-    // rev 110101 --> Done, Tested
-    // rnd 110110 --> Done, Tested
-    // lw  110111 --> Done
-    // sw  111000 --> Done
-
-    // todo: maybe add three signals (lower, higher, equal) to output of coprocessor
-    //todo: sw and lw and connections (signals: input - output of this module)
-    //tested and was correct: add - sub - mul - div - rev
-    //not tested: cmp
-    //in progress: rnd
+     /*verilator lint_off WIDTH*/
     always @(posedge clk) begin
-    
-        //lw (load word)
-        //if (opcode == 6'b110111)
-        
- choos_coprocessor_data_to_memory = 1'b0;       if (write_data_enable == 1'b1)
- 
-           registers[addr_reg_in1] = inputdata_float;
+        register[0] = 0;
+
+        if (!cache_done) begin
+        if (write_data_enable == 1'b1) begin
+            register[write_address] = inputdata_float;
+        end
 
         //sw (store word)
-        else if (opcode == 6'b111000)
- 
-            choos_coprocessor_data_to_memory = 1'b1;           outdata_float = registers[addr_reg_in1];
+        else if (opcode == 6'b001011)
+            outdata_float = register[addr_reg_in2];
 
         // add and subtract
         else if (opcode[5:1] == 5'b11000) begin
-        mantisa[0] = {1'b1, register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
-        mantisa[1] = {1'b1, register[addr_reg_in2][22:0]};
-        exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
-        exponent[1] = register[addr_reg_in2][30:23];
-        sign[0] = register[addr_reg_in1][31];
-        sign[1] = register[addr_reg_in2][31];
+        mantisa[0] = {1'b1, register[addr_reg_in2][22:0]}; // store the mantisa and exponent of each operand
+        mantisa[1] = {1'b1, register[addr_reg_in1][22:0]};
+        exponent[0] = register[addr_reg_in2][30:23]; // store the mantisa and exponent of each operand
+        exponent[1] = register[addr_reg_in1][30:23];
+        sign[0] = register[addr_reg_in2][31];
+        sign[1] = register[addr_reg_in1][31];
 
-        if (register[addr_reg_in2] == 0)
+        if (register[addr_reg_in1] == 0)
             register[addr_destination] = register[addr_reg_in1];
         else begin
-            if (register[addr_reg_in1] == 0) begin
-                register[addr_destination] = register[addr_reg_in2];
+            if (register[addr_reg_in2] == 0) begin
+                register[addr_destination] = register[addr_reg_in1];
                 if (opcode[0]==1'b1)
                     register[addr_destination][31] = ~register[addr_destination][31];
                 else
@@ -133,17 +120,17 @@ module coprocessor(
 
         // multiply
         end else if(opcode == 6'b110010) begin
-            mantisa[0] = {1'b1, register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
-            mantisa[1] = {1'b1, register[addr_reg_in2][22:0]};
-            exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
-            exponent[1] = register[addr_reg_in2][30:23];
+            mantisa[0] = {1'b1, register[addr_reg_in2][22:0]}; // store the mantisa and exponent of each operand
+            mantisa[1] = {1'b1, register[addr_reg_in1][22:0]};
+            exponent[0] = register[addr_reg_in2][30:23]; // store the mantisa and exponent of each operand
+            exponent[1] = register[addr_reg_in1][30:23];
 
-            if (register[addr_reg_in1] == 0 || register[addr_reg_in2] == 0)
+            if (register[addr_reg_in2] == 0 || register[addr_reg_in1] == 0)
                 register[addr_destination] = 0;
             else begin
                 mul_ans = 0;
                 register[addr_destination][30:23] = exponent[0] + exponent[1] - bias + 1;
-                register[addr_destination][31] = register[addr_reg_in1][31] ^ register[addr_reg_in2][31];
+                register[addr_destination][31] = register[addr_reg_in2][31] ^ register[addr_reg_in1][31];
                 mul_ans = mantisa[0] * mantisa[1];
                 for (i = 0;i < 23 && mul_ans[47] != 1 ; i = i+1 ) begin
                     mul_ans = mul_ans << 1;
@@ -156,18 +143,17 @@ module coprocessor(
 
         // divide
         else if(opcode == 6'b110011) begin
-            div_by_zero = 0;
-
-            mantisa[0] = {1'b1, register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
-            mantisa[1] = {1'b1, register[addr_reg_in2][22:0]};
-            exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
-            exponent[1] = register[addr_reg_in2][30:23];
-            if (register[addr_reg_in2] == 0)
-                div_by_zero = 1;
-            else if(register[addr_reg_in1] == 0)
+            
+            mantisa[0] = {1'b1, register[addr_reg_in2][22:0]}; // store the mantisa and exponent of each operand
+            mantisa[1] = {1'b1, register[addr_reg_in1][22:0]};
+            exponent[0] = register[addr_reg_in2][30:23]; // store the mantisa and exponent of each operand
+            exponent[1] = register[addr_reg_in1][30:23];
+            if (register[addr_reg_in1] == 0)
+                register[0][0] = 1;
+            else if(register[addr_reg_in2] == 0)
                 register[addr_destination] = 0;
             else begin
-                register[addr_destination][31] = register[addr_reg_in1][31] ^ register[addr_reg_in2][31];
+                register[addr_destination][31] = register[addr_reg_in2][31] ^ register[addr_reg_in1][31];
 
                 extra = {mantisa[0],24'b0};
                 extra = extra / mantisa[1];
@@ -184,16 +170,17 @@ module coprocessor(
                 end
                 register[addr_destination][22:0] = div_ans[22:0];
             end
+            
         end
         
         //compare //cmp
         else if(opcode == 6'b110100) begin
-            mantisa[0] = {1'b1, register[addr_reg_in1][22:0]}; // store the mantisa and exponent of each operand
-            mantisa[1] = {1'b1, register[addr_reg_in2][22:0]};
-            exponent[0] = register[addr_reg_in1][30:23]; // store the mantisa and exponent of each operand
-            exponent[1] = register[addr_reg_in2][30:23];
-            sign[0] = register[addr_reg_in1][31];
-            sign[1] = register[addr_reg_in2][31];
+            mantisa[0] = {1'b1, register[addr_reg_in2][22:0]}; // store the mantisa and exponent of each operand
+            mantisa[1] = {1'b1, register[addr_reg_in1][22:0]};
+            exponent[0] = register[addr_reg_in2][30:23]; // store the mantisa and exponent of each operand
+            exponent[1] = register[addr_reg_in1][30:23];
+            sign[0] = register[addr_reg_in2][31];
+            sign[1] = register[addr_reg_in1][31];
 
             lower = 0;
             higher = 0;
@@ -202,7 +189,7 @@ module coprocessor(
             if (!sign[0] && !sign[1]) begin
                 if (exponent[0] > exponent[1])
                     higher = 1;
-                else if (exponent[0] < exponent[1])
+                else if (exponent[0] < exponent[1]) 
                     lower = 1;
                 else begin
                     if (mantisa[0] > mantisa[1])
@@ -231,18 +218,24 @@ module coprocessor(
                         equal = 1; 
                 end
             end
+
+            if (lower) begin
+                register[31] = register[addr_reg_in1];
+                register[30] = register[addr_reg_in2];
+            end else begin
+                register[31] = register[addr_reg_in2];
+                register[30] = register[addr_reg_in1];
+            end
         end
 
         // reverse
         else if (opcode == 6'b110101) begin
-            div_by_zero = 0;
-
             mantisa[0] = {1'b1, 23'b00000000000000000000000};
             mantisa[1] = {1'b1, register[addr_reg_in1][22:0]};
             exponent[0] = 8'b01111111;
             exponent[1] = register[addr_reg_in1][30:23];
             if (register[addr_reg_in1] == 0)
-                div_by_zero = 1;
+                register[0][0] = 1;
             else begin
                 register[addr_destination][31] = register[addr_reg_in1][31];
 
@@ -253,6 +246,7 @@ module coprocessor(
                     extra = extra >> 1;
                 else
                     exponent[0] = exponent[0] - 1;
+               
                 div_ans = extra[23:0];
                 register[addr_destination][30:23] = exponent[0] - exponent[1] + bias;
 
@@ -264,12 +258,12 @@ module coprocessor(
         end
 
         // round
-        else if (opcode = 6'b110110) begin
-            mantisa[0] = register[addr_reg_in1][22:0];
-            exponent[0] = register[addr_reg_in1][30:23];
-            sign[0] = register[addr_reg_in1][31];
+        else if (opcode == 6'b110110) begin
+            mantisa[0] = register[addr_reg_in2][22:0];
+            exponent[0] = register[addr_reg_in2][30:23];
+            sign[0] = register[addr_reg_in2][31];
 
-            register[addr_destination] = register[addr_reg_in1];
+            register[addr_destination] = register[addr_reg_in2];
 
             power = exponent[0] - bias;
             if (0 <= power && power <= 22) begin
@@ -290,6 +284,6 @@ module coprocessor(
             end
         end
     end
-
-
+    end
+ /*verilator lint_off WIDTH*/
 endmodule
