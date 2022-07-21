@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Tue Jul 19 15:14:57 2022
+
+# Make data base, printed on Thu Jul 21 23:21:59 2022
 
 # Variables
 
@@ -44,8 +47,6 @@ VSCODE_CWD = /
 # environment
 PATH = /Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/local/bin:/opt/local/sbin:/Users/AMF/opt/anaconda3/bin:/Users/AMF/opt/anaconda3/condabin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/share/dotnet:/opt/X11/bin:~/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 # environment
-LaunchInstanceID = 1B165477-4ED3-4EE1-AE94-4E90C5A10EDC
-# environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
@@ -70,7 +71,7 @@ MEM = $(ASM:%.s=%.mem)
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/b06ae3b2d2dbfe28bca3134cc6be65935cdfea6a
+VSCODE_CODE_CACHE_PATH = /Users/AMF/Library/Application Support/Code/CachedData/3b889b090b5ad5793f524b5d1d39fda662b96a2a
 # environment
 LOGNAME = AMF
 # environment
@@ -112,7 +113,7 @@ TMPDIR = /var/folders/v9/9psw4j7x6nx9vjnl5ncfdzh00000gp/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.69.1-main.sock
+VSCODE_IPC_HOOK = /Users/AMF/Library/Application Support/Code/1.69.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -122,7 +123,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.80817061.80817067
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.81497080.81497086
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -141,8 +142,6 @@ MAKEFILES :=
 LC_ALL = C
 # environment
 CONDA_PYTHON_EXE = /Users/AMF/opt/anaconda3/bin/python
-# environment
-SECURITYSESSIONID = 186a5
 # automatic
 ^F = $(notdir $^)
 # default
@@ -158,7 +157,7 @@ TEST_DIRS = $(wildcard test/**/)
 # environment
 CONDA_PREFIX = /Users/AMF/opt/anaconda3
 # environment
-VSCODE_PID = 567
+VSCODE_PID = 16578
 # makefile (from `Makefile', line 23)
 INPUT = test/default/addiu
 # environment
@@ -166,7 +165,7 @@ _CE_CONDA =
 # environment
 LANG = C
 # variable set hash-table stats:
-# Load=77/1024=8%, Rehash=0, Collisions=2/104=2%
+# Load=75/1024=7%, Rehash=0, Collisions=2/102=2%
 
 # Pattern-specific Variable Values
 
@@ -174,12 +173,12 @@ LANG = C
 
 # Directories
 
-# . (device 16777220, inode 79971131): 15 files, no impossibilities.
-# test/default (device 16777220, inode 79971255): 27 files, no impossibilities.
+# . (device 16777220, inode 79971131): 16 files, no impossibilities.
+# test/default (device 16777220, inode 79971255): 30 files, no impossibilities.
 # 323src (device 16777220, inode 79971231): 7 files, no impossibilities.
-# src (device 16777220, inode 79971241): 19 files, no impossibilities.
+# src (device 16777220, inode 79971241): 20 files, no impossibilities.
 
-# 68 files, no impossibilities in 4 directories.
+# 73 files, no impossibilities in 4 directories.
 
 # Implicit Rules
 
@@ -197,7 +196,7 @@ LANG = C
 
 # Files
 
-obj_dir/Vmips_machine: src/EX.sv src/ID.sv src/IF.sv src/MEM.sv src/alu.sv src/cache.sv src/cache_control.sv src/controll.sv src/coprocessor.sv src/mips_core.sv src/pc.sv src/round_test.sv src/test_add_sub.sv src/test_div.sv src/test_mul.sv src/test_rev.sv 323src/dff.sv 323src/memory.sv 323src/mips_machine.sv 323src/regfile.sv 323src/sim_main.cpp
+obj_dir/Vmips_machine: src/EX.sv src/ID.sv src/IF.sv src/MEM.sv src/alu.sv src/cache.sv src/cache_control.sv src/controll.sv src/coprocessor.sv src/mips_core.sv src/pc.sv src/test_add_sub.sv src/test_cmp.sv src/test_div.sv src/test_mul.sv src/test_rev.sv src/test_rnd.sv 323src/dff.sv 323src/memory.sv 323src/mips_machine.sv 323src/regfile.sv 323src/sim_main.cpp
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -216,13 +215,13 @@ src/test_add_sub.sv:
 #  File has not been updated.
 
 # Not a target:
-src/IF.sv:
+src/test_rnd.sv:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 
 # Not a target:
-src/round_test.sv:
+src/IF.sv:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -256,7 +255,7 @@ test/default/shifttest.mem:
 #  Modification time never checked.
 #  File has not been updated.
 
-assemble: test/default/addiu.mem test/default/addtest.mem test/default/arithtest.mem test/default/brtest0.mem test/default/brtest2.mem test/default/memtest0.mem test/default/sb.mem test/default/shifttest.mem
+assemble: test/default/addiu.mem test/default/addtest.mem test/default/arithtest.mem test/default/brtest0.mem test/default/brtest2.mem test/default/float.mem test/default/memtest0.mem test/default/sb.mem test/default/shifttest.mem
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -294,9 +293,6 @@ test/default/memtest0.mem:
 # Not a target:
 .SUFFIXES:
 #  Implicit rule search has not been done.
- 
-make: *** No rule to make target `all'.  Stop.
-
 #  Modification time never checked.
 #  File has not been updated.
 
@@ -311,6 +307,7 @@ Makefile:
 #  Implicit rule search has been done.
 #  Last modified 2022-07-19 01:45:55
 #  File has been updated.
+ 
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
@@ -341,6 +338,12 @@ src/MEM.sv:
 
 # Not a target:
 src/alu.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/default/float.mem:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -438,6 +441,12 @@ verify: sim
 	
 
 # Not a target:
+src/test_cmp.sv:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
 test/default/brtest2.mem:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -484,7 +493,7 @@ src/coprocessor.sv:
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=42/1024=4%, Rehash=0, Collisions=0/92=0%
+# Load=44/1024=4%, Rehash=0, Collisions=0/96=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -496,6 +505,6 @@ src/coprocessor.sv:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Tue Jul 19 15:14:57 2022
+# Finished Make data base on Thu Jul 21 23:21:59 2022
 
  

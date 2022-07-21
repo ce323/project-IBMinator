@@ -4,10 +4,12 @@ module coprocessor(
     input clk , 
     output [31:0] outdata_float ,
     input [31:0] inputdata_float ,
-    input write_data_enable   
+    input write_data_enable,
+    //output reg write_data_enable_out,
+    output reg ch   _coprocessor_data_to_memory
 );
 
-    integer i;
+    integer is;
     reg [31:0] registers [31:0];
     reg [31:0] t [0:5];
     reg [23:0] mantisa [2:0];
@@ -49,12 +51,14 @@ module coprocessor(
         //lw (load word)
         //if (opcode == 6'b110111)
         
-        if (write_data_enable == 1'b1)
-            registers[addr_reg_in1] = inputdata_float;
+ choos_coprocessor_data_to_memory = 1'b0;       if (write_data_enable == 1'b1)
+ 
+           registers[addr_reg_in1] = inputdata_float;
 
         //sw (store word)
         else if (opcode == 6'b111000)
-            outdata_float = registers[addr_reg_in1];
+ 
+            choos_coprocessor_data_to_memory = 1'b1;           outdata_float = registers[addr_reg_in1];
 
         // add and subtract
         else if (opcode[5:1] == 5'b11000) begin
