@@ -24,6 +24,7 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, cache_done
  	`define norr 6'b100111
  	`define addiu 6'b100001
 	`define add  6'b100000
+	`define sws  6'b001011
 	`define mult 6'b011000
   	`define div 6'b011010
   	`define andd 6'b100100
@@ -74,7 +75,9 @@ module alu(input1w , input2w  , out , funcw , zero, clk, rst_b, inst, cache_done
 				out = input1 | {16'b0, input2[15:0]};
  			`norr :
 				out = ~(input1 | input2);
-			`add:
+			`add :
+				out = $signed(input1) + $signed(input2);
+			`sws:
 				out = $signed(input1) + $signed(input2);
  			`addiu :
 				out = input1 + {16'b0, input2[15:0]};
